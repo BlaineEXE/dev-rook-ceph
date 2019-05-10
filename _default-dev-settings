@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+#------------------#
+# Cluster settings #
+#------------------#
+
+# Prevent cluster collisions in shared environments with a resource name prefix
+# Can safely be commented-out for local libvirt use
+export CLUSTER_PREFIX="$USER-"
+
+# Number of Kubernetes master and worker nodes to create for the dev cluster
+# One-node clusters should be a single master with no workers.
+export NUM_MASTERS=1
+export NUM_WORKERS=2
+
+# Configure how the cluster nodes are configured.
+# The node OS image is a URL which will be downloaded
+export NODE_OS_IMAGE="https://download.opensuse.org/distribution/leap/15.0/jeos/openSUSE-Leap-15.0-JeOS.x86_64-15.0.1-OpenStack-Cloud-Current.qcow2"
+export NODE_ROOK_VOLUMES=2   # Add this many volumes to each cluster node
+export NODE_ROOK_VOLUME_SIZE_GB=10  # Size of added volumes in Gigabytes
+export NODE_VCPUS=2
+export NODE_RAM_MB=2048
+
+export NET_DOMAIN_NAME="rook-dev.net"
+export NET_CIDR="172.60.0.0/22"
+
+
+#---------------------#
+# Kubernetes settings #
+#---------------------#
+
+export K8S_VERSION=v1.13.4
+export KUBECONFIG="${PWD}/kubeconfig"
+
+
+#------------------#
+# Libvirt settings #
+#------------------#
+export LIBVIRT_URI="qemu:///system"
+
+# NODE_OS_IMAGE will be downloaded to this pool
+export LIBVIRT_IMAGE_DOWNLOAD_POOL="default"
+
+# OS disks for nodes will be created in this pool; os disks in particular can benefit from using a
+# pool backed by solid state disks
+export LIBVIRT_OS_VOL_POOL="default"
+
+# extra volumes used for Rook storage will be created in this pool
+export LIBVIRT_ROOK_VOL_POOL="default"

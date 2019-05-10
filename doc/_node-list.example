@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# The '_node-list' file can be written manually if you would like to use these dev tools with a
+# cluster you have set up without the cluster build tooling.
+
+#
+# Required _node-list variables
+#
+
+# these definitions should be replaced with values for your own cluster
+masters="10.254.3.142"
+
+workers="10.254.3.4
+10.254.3.70"
+
+# these definitions can be taken as-is
+all="${masters} ${workers}"
+
+first_master="${masters%%[$'\n' ]*}"
+noninitial_masters="${masters/$first_master/}"
+
+
+#
+# Non-required, convenience _node-list variables
+#
+k8s_master_0="10.254.3.142"
+k8s_worker_0="10.254.3.4"
+k8s_worker_1="10.254.3.70"

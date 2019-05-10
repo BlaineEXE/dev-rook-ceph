@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+source _default-dev-settings
+
+# Add your own overrides to the default-dev-settings here
+# examples:
+# export K8S_VERSION="v1.12.4"
+# export CLUSTER_PREFIX=""
+# export LIBVIRT_OS_VOL_POOL="ssd"

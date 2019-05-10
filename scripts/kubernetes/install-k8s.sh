@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+source scripts/shared.sh
+source _node-list
+
+kube_setup_dir="/root/.setup-kube"
+
+echo "Installing Kubernetes ${K8S_VERSION} ..."
+
+
+echo "  copying config files to cluster ..."
+suppress_output_unless_error \
+  "${OCTOPUS} --host-groups all          copy scripts/kubernetes/KUBELET_EXTRA_ARGS /root"
+suppress_output_unless_error \
+  "${OCTOPUS} --host-groups first_master copy scripts/kubernetes/kubeadm-init-config.yaml \
+                                              scripts/kubernetes/cluster-psp.yaml         \
+                                           ${kube_setup_dir}"
+
+echo "  running 'kubeadm init' on first master ..."
+# init config file has extra API server args to enable psp access control
+suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
+  'kubeadm init --config=${kube_setup_dir}/kubeadm-init-config.yaml'"
+
+echo "  setting up root user on first master as Kubernetes administrator ..."
+suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
+  'mkdir -p /root/.kube && ln -f -s /etc/kubernetes/admin.conf /root/.kube/config'"
+suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
+  'kubectl completion bash > ~/.kube/kubectl-completion.sh && chmod +x ~/.kube/kubectl-completion.sh'"
+
+echo "  setting up default cluster pod security policies (PSPs) ..."
+suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
+  'kubectl apply -f ${kube_setup_dir}/cluster-psp.yaml'"
+
+echo "  setting up cluster overlay network CNI ..."
+suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
+  'kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/bc79dd1505b0c8681ece4de4c0d86c5cd2643275/Documentation/kube-flannel.yml'"
+
+# echo "  joining remaining master nodes to Kubernetes cluster ..."
+# join_command="??????"
+# ${OCTOPUS} --host-groups noninitial_masters run "${join_command}"
+
+echo "  joining worker nodes to Kubernetes cluster ..."
+join_command="$(${OCTOPUS} --host-groups first_master run \
+                  'kubeadm token create --print-join-command' | grep 'kubeadm join')"
+suppress_output_unless_error "${OCTOPUS} --host-groups workers run '${join_command}'"
+
+echo "  downloading the admin kubeconfig file locally ..."
+scp -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+    -i "${PWD}"/scripts/resources/.ssh/id_rsa \
+  root@"${first_master}":/root/.kube/config kubeconfig
+
+echo "... done."

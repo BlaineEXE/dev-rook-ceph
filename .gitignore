@@ -1,0 +1,14 @@
+/.images/
+/.octopus/
+/.rook-config/
+/.tools/
+
+/_node-list
+/kubeconfig
+
+/developer-settings
+
+/rook
+/scripts/rook/_*
+
+__pycache__

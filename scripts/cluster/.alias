@@ -1,0 +1,11 @@
+
+alias l='ls -alF'
+alias la='ls -la'
+alias ll='ls -l'
+
+alias k="kubectl"
+
+alias ks="kubectl --namespace kube-system"
+
+alias kr="kubectl --namespace rook-ceph"
+alias krs="kubectl --namespace rook-ceph-system"
