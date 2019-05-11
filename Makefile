@@ -3,15 +3,13 @@ include makelib.mk
 # The theory behind makefile targets is that targets (or target groups) should not share the same
 # 3 letters so tab complete is useful for the user. Ideally, the first 2 letters.
 
-default:
-	@ # Do nothing if make has no args
+.DEFAULT_GOAL := help
 
 ##
 ## CONFIGURATION
-##   There are many environment variable-based tunable parameters for changing how the dev
-##   environment is set up. These defaults can be found in `_default-dev-settings`. It is intended
-##   that the user can provide their own overrides in the `developer-settings` file.
-
+##  There are many tunable parameters for changing how the dev cluster/environment is set up.
+##  Configuration is not requred, as sensible default values are already applied. If desired, the user
+##  should set their configuration overrides in the ${FIL}developer-settings${NON} file.
 
 ##
 ## QUICKSTART
@@ -21,7 +19,7 @@ quickstart:
 
 ##
 ## CLUSTER TARGETS
-##   cluster.build      Stand up a cluster for development with params defined in 'developer-settings'
+##   cluster.build      Stand up a cluster for development with params defined in ${GRN}developer-settings${NON}
 cluster.build:
 	@ $(SUDO) $(PYTHON) scripts/libvirt/apply.py
 	@ $(SUDO) $(PYTHON) scripts/libvirt/generate-node-list.py
@@ -33,7 +31,7 @@ cluster.destroy:
 	@ rm -f $(KUBECONFIG)
 	@ $(MAKE) rook.destroy-hook.%
 
-##   cluster.setup      Set up the cluster's basic tooling
+##   cluster.setup      Set up the cluster's basic user tooling
 cluster.setup: $(OCTOPUS_TOOL)
 	@ $(BASH) scripts/cluster/wait-for-up.sh
 	@ $(BASH) scripts/cluster/config-octopus.sh
@@ -48,7 +46,7 @@ cluster.setup: $(OCTOPUS_TOOL)
 
 ##
 ## KUBERNETES TARGETS
-##   kubernetes.install Install Kubernetes on the cluster with params defined in 'developer-settings'
+##   kubernetes.install Install Kubernetes on the cluster with params defined in ${GRN}developer-settings${NON}
 kubernetes.install: $(OCTOPUS_TOOL)
 	@ $(BASH) scripts/kubernetes/install-kubeadm.sh
 	@ $(BASH) scripts/kubernetes/install-k8s.sh
@@ -79,7 +77,4 @@ call.script.%:
 #
 .PHONY: help
 # Use sed on this makefile to render all lines beginning with '##'
-help: Makefile
-	@ sed -n 's/^##//p' $<
-
-##
+help: Makefile.help

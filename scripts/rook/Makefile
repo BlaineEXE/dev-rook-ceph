@@ -2,19 +2,18 @@
 # 3 letters so tab complete is useful for the user. Ideally, the first 2 letters.
 
 ##
-## ROOK TARGET USAGE
-##   A good pattern for Rook development is to keep 2 (or more) branches:
-##     1. a "config branch" with kubernetes manifest files edited to install Rook in your cluster
-##          Manifest files are in    cluster/examples/kubernetes/ceph/
-##          The master branch is a good default for installing in CaaSP clusters
-##     2. a working branch with your Rook code changes
-##          This is where your Rook changes live without needing to have manifest files modified
+## BASIC WORKFLOW
 ##
-##   Using this pattern, a good dev workflow for Rook code is:
-##     1. Copy Rook's Kubernetes install config         make rook.copy-config   (from config branch)
-##     2. Build and push Rook images to hosts           make rook.build        (from working branch)
-##     3. Install Rook                                  make rook.install          (from any branch)
-##     4. Uninstall Rook before using a new config      make rook.uninstall        (from any branch)
+##  This environment makes it possible to keep separate branches for config changes and code changes:
+##    * 'config' branches with modified manifest files used for installing Rook with different
+##      configurations. Rook manifests exist in ${DIR}rook/cluster/examples/kubernetes/ceph/${NON}.
+##    * 'working' branches with code changes separate from any manifest file changes.
+##
+##  Using this pattern, a good dev workflow for Rook code is:
+##    1. Copy Rook's install config                 ${CMD}make rook.set-config${NON}  (from config branch)
+##    2. Build and push Rook images to hosts        ${CMD}make rook.build${NON}        (from working branch)
+##    3. Install Rook                               ${CMD}make rook.install${NON}      (from any branch)
+##    4. Uninstall Rook before using a new config   ${CMD}make rook.uninstall${NON}    (from any branch)
 
 # Targets followed by '%' are hidden from make's tab complete. These targets can be called via
 # `make target.%`; however, this is an advanced usage not documented in the help text.
@@ -37,8 +36,8 @@ rook.make.%: $(GO_TOOL) rook.symlink.%
 ## ROOK BUILD/INSTALL TARGETS
 
 ##
-##   rook.copy-config      Copy the current Rook branch's config files to '.rook-config/'. This allows
-##                         you to have a consistent Rook config after branch changes.
+##   rook.set-config       Copy the current Rook branch's manifest files to ${DIR}.rook-config/${NON}. This allows
+##                         you to have a consistent Rook config regardless of branch changes.
 CURRENT_CONFIG_BRANCH_FILE := $(ROOK_CONFIG_DIR)/_current-config-branch
 $(CURRENT_CONFIG_BRANCH_FILE): rook.symlink.%
 	@ printf '  WARNING! There is no record of a config branch selected for use'
@@ -49,11 +48,17 @@ $(CURRENT_CONFIG_BRANCH_FILE): rook.symlink.%
 # Print the current config branch for the user to see
 rook.print-config-branch.%:
 	@ echo "  CURRENT CONFIG BRANCH: $$(cat $(CURRENT_CONFIG_BRANCH_FILE) 2> /dev/null)"
-rook.copy-config: rook.symlink.%
+rook.set-config: rook.symlink.%
 	@ mkdir -p $(ROOK_CONFIG_DIR)
 	@ cp -a rook/cluster/examples/kubernetes $(ROOK_CONFIG_DIR)/.
 	@ git -C rook/ rev-parse --abbrev-ref HEAD > $(CURRENT_CONFIG_BRANCH_FILE)
 	@ $(MAKE) rook.showinfo
+
+##
+##   rook.unset-config     Unset the copied Rook manifest files to always use manifests from the
+##                         active branch.
+rook.unset-config:
+	@ rm -rf $(ROOK_CONFIG_DIR) # contains CURRENT_CONFIG_BRANCH_FILE
 
 ##
 ##   rook.build            Build Rook locally, and push the Rook image to nodes as 'rook/rook:master'
@@ -74,9 +79,8 @@ rook.build: rook.symlink.%
 	@ $(MAKE) rook.showinfo
 
 ##
-##   rook.install          Install Rook on the cluster with the config files set up via
-##                         'rook.copy-config'. Uses the current branch's config if copy-config
-##                         target hasn't been called.
+##   rook.install          Install Rook on the cluster with the config files set via ${TGT}rook.set-config${NON}.
+##                         Uses the active branch's config if the set config target hasn't been called.
 rook.install: $(CURRENT_CONFIG_BRANCH_FILE)
 	@ $(BASH) scripts/rook/install.sh
 	@ $(BASH) scripts/rook/install-filesystem.sh
@@ -84,8 +88,8 @@ rook.install: $(CURRENT_CONFIG_BRANCH_FILE)
 	@ $(MAKE) rook.showinfo
 
 ##
-##   rook.uninstall        Uninstall Rook from the cluster with the config files set via
-##                         'rook.copy-config'. Run this target before copying new configs.
+##   rook.uninstall        Uninstall Rook from the cluster using the most recently set (or installed)
+##                         config files. Run this target before copying new configs.
 rook.uninstall: $(CURRENT_CONFIG_BRANCH_FILE)
 	@ $(BASH) scripts/rook/uninstall.sh
 	@ $(MAKE) rook.showinfo
@@ -118,7 +122,7 @@ rook.rebuild:
 ##
 ##   rook.reconfig         Uninstall Rook cluster, then install Rook again with the current config
 ##                         and with the same Rook images. Useful for iterating on Rook config changes.
-rook.reconfig: rook.uninstall rook.copy-config rook.install rook.showinfo
+rook.reconfig: rook.uninstall rook.set-config rook.install rook.showinfo
 	@ bash scripts/resources/success-message.sh "ROOK IS REINSTALLED WITH A NEW CONFIG"
 
 ##
@@ -135,14 +139,13 @@ rook.showinfo:
 	@ echo ''
 
 ##
-##
-## ROOK DEV TOOLS
+## ROOK DEV/DEBUG TARGETS
 ##
 ##   rook.toolbox-connect  Connect to the Rook toolbox.
 rook.toolbox-connect:
 	@ $(BASH) scripts/rook/toolbox-connect.sh
 
-##   rook.operator-logs    Print the Rook operator log, and continue to follow the log.
+##   rook.operator-logs    Print and continue following the Rook operator log.
 rook.operator-logs:
 	@ $(BASH) scripts/rook/follow-operator-log.sh
 
@@ -151,11 +154,8 @@ rook.operator-logs:
 #
 .PHONY: rook.help
 # Use sed on this makefile to render all lines beginning with '##'
-rook.help: scripts/rook/Makefile
-	@ sed -n 's/^##//p' $<
+rook.help: scripts/rook/Makefile.help
 
-##
 
-rook.destroy-hook.%:
+rook.destroy-hook.%: rook.unset-config
 	@ rm -f CURRENT_BUILT_BRANCH_FILE
-	@ rm -rf $(ROOK_CONFIG_DIR) # contains CURRENT_CONFIG_BRANCH_FILE

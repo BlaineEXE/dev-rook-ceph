@@ -17,6 +17,7 @@ There are some important high-level goals guiding the design of this environment
  - The tooling should not be arcane; it should be inspectable and extensible by most developers; and
    it should not be overly complex
  - The tooling should prioritize fast development iteration
+ - The tooling should be idempotent when possible
 
 
 Prerequisites
