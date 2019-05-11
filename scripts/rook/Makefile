@@ -10,7 +10,7 @@
 ##    * 'working' branches with code changes separate from any manifest file changes.
 ##
 ##  Using this pattern, a good dev workflow for Rook code is:
-##    1. Copy Rook's install config                 ${CMD}make rook.set-config${NON}  (from config branch)
+##    1. Copy Rook's install config                 ${CMD}make rook.set-config${NON}   (from config branch)
 ##    2. Build and push Rook images to hosts        ${CMD}make rook.build${NON}        (from working branch)
 ##    3. Install Rook                               ${CMD}make rook.install${NON}      (from any branch)
 ##    4. Uninstall Rook before using a new config   ${CMD}make rook.uninstall${NON}    (from any branch)
