@@ -8,7 +8,6 @@ kube_setup_dir="/root/.setup-kube"
 
 echo "Installing Kubernetes ${K8S_VERSION} ..."
 
-
 echo "  copying config files to cluster ..."
 suppress_output_unless_error \
   "${OCTOPUS} --host-groups all          copy scripts/kubernetes/KUBELET_EXTRA_ARGS /root"
@@ -19,8 +18,10 @@ suppress_output_unless_error \
 
 echo "  running 'kubeadm init' on first master ..."
 # init config file has extra API server args to enable psp access control
+init_command="kubeadm init --config=${kube_setup_dir}/kubeadm-init-config.yaml"
+# for idempotency, do not run init if docker is already running kube resources
 suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
-  'kubeadm init --config=${kube_setup_dir}/kubeadm-init-config.yaml'"
+  'if ! docker ps -a | grep -q kube; then ${init_command} ; fi'"
 
 echo "  setting up root user on first master as Kubernetes administrator ..."
 suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
@@ -43,7 +44,9 @@ suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
 echo "  joining worker nodes to Kubernetes cluster ..."
 join_command="$(${OCTOPUS} --host-groups first_master run \
                   'kubeadm token create --print-join-command' | grep 'kubeadm join')"
-suppress_output_unless_error "${OCTOPUS} --host-groups workers run '${join_command}'"
+# for idempotency, do not run init if docker is already running kube resources
+suppress_output_unless_error "${OCTOPUS} --host-groups workers run \
+  'if ! docker ps -a | grep -q kube; then ${join_command} ; fi'"
 
 echo "  downloading the admin kubeconfig file locally ..."
 scp -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
