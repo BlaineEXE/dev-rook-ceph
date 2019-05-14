@@ -42,6 +42,8 @@ FIL=$(GRN)
 TGT=$(ORG)
 DIR=$(BLU)
 HDR=$(BLD)
+ENV=$(BLD)
+VAL=$(BLD)
 
 # help target allows self-documenting makefiles
 %.help:
@@ -54,6 +56,7 @@ HDR=$(BLD)
 	@ bash -c "echo -e \"$$( \
 	    sed -n -e 's/^##//p' $* | \
 	    sed -e 's/^ \([A-Z /]\+\)$$/ $${HDR}\1$${NON}/' | \
-			sed -e 's/^   \([A-Za-z.-]\+\)\(.*\)/   $${TGT}\1$${NON}\2/' \
+			sed -e 's/^   \([A-Za-z.-]\+\)\(.*\)/   $${TGT}\1$${NON}\2/' | \
+			sed -e 's/\"/\\\"/g' \
 	  )\""
 	@ echo ''

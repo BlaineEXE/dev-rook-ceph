@@ -62,9 +62,14 @@ upgrade.rook: $(UPGRADE_TO_CONFIG_DIR)
 	@ $(BASH) scripts/upgrade/rook.sh
 	@ bash scripts/resources/success-message.sh "UPGRADE IS COMMENCING. USER IS RESPONSIBLE FOR WATCHING UPGRADE."
 
-##   upgrade.ceph       (not yet implemented)
+NEW_CEPH_IMAGE ?= ceph/ceph:v14.2
+##   upgrade.ceph       Upgrade the Ceph image to that defined by the env var ${ENV}NEW_CEPH_IMAGE${NON}.
+##                          (default ${VAL}${NEW_CEPH_IMAGE}${NON})
+upgrade.ceph:
+	@ $(BASH) scripts/upgrade/ceph.sh
+	@ bash scripts/resources/success-message.sh "UPGRADE IS COMMENCING. USER IS RESPONSIBLE FOR WATCHING UPGRADE."
 
-##   upgrade.showinfo   Print ${TGT}rook.showinfo${NON} info supplemented with 'from' and 'to' config branches.
+##   upgrade.showinfo   Print ${TGT}rook.showinfo${NON} info supplemented with "from" and "to" config branches.
 upgrade.showinfo:
 	@ $(MAKE) rook.showinfo
 	@ echo "  UPGRADE FROM BRANCH: $$(cat $(UPGRADE_FROM_CONFIG_BRANCH_FILE) 2> /dev/null)"

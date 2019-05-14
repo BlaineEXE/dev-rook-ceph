@@ -64,9 +64,9 @@ cat /tmp/cephfs/hello
 umount /tmp/cephfs
 rmdir /tmp/cephfs
 EOF
-)" | tee .start-file-results.txt
+)" | tee /tmp/.start-file-results.txt
 
-if [ ! "$(cat .start-file-results.txt)" = "Hello Rook" ]; then
+if [ ! "$(cat /tmp/.start-file-results.txt)" = "Hello Rook" ]; then
   echo "  Ceph filesystem does not seem to be persistent!"
   exit 1
 fi

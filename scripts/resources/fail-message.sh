@@ -12,8 +12,8 @@ FAILURE!
 
 EOF
 
-tput bel
-sleep 0.1
-tput bel
-sleep 0.1
-tput bel
+# tput bel
+# sleep 0.1
+# tput bel
+# sleep 0.1
+# tput bel

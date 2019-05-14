@@ -12,4 +12,4 @@ SUCCESS!
 
 EOF
 
-tput bel
+# tput bel
