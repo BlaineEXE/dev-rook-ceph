@@ -45,12 +45,12 @@ HDR=$(BLD)
 
 # help target allows self-documenting makefiles
 %.help:
-	@ # 'bash -c' interprets text format env vars (e.g., '${RED}')
-	@ # 'echo -e' renders colored text
-	@ # sed chooses all lines beginning with '##'
-	@ # sed puts all-caps header lines in bold
-	@ # sed puts all target lines in orange (targets are 3 spaces indented)
-	@ # sed escapes double quotes with a forward slash for echo
+# 'bash -c' interprets text format env vars (e.g., '${RED}')
+# 'echo -e' renders colored text
+# sed chooses all lines beginning with '##'
+# sed puts all-caps header lines in bold
+# sed puts all target lines in orange (targets are 3 spaces indented)
+# sed escapes double quotes with a forward slash for echo
 	@ bash -c "echo -e \"$$( \
 	    sed -n -e 's/^##//p' $* | \
 	    sed -e 's/^ \([A-Z /]\+\)$$/ $${HDR}\1$${NON}/' | \

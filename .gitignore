@@ -2,6 +2,8 @@
 /.octopus/
 /.rook-config/
 /.tools/
+/.upgrade-from-config/
+/.upgrade-to-config/
 
 /_node-list
 /kubeconfig

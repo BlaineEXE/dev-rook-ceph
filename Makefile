@@ -30,6 +30,7 @@ cluster.destroy:
 	@ rm -f _node-list
 	@ rm -f $(KUBECONFIG)
 	@ $(MAKE) rook.destroy-hook.%
+	@ $(MAKE) upgrade.destroy-hook.%
 
 ##   cluster.setup      Set up the cluster's basic user tooling
 cluster.setup: $(OCTOPUS_TOOL)
@@ -58,7 +59,7 @@ kubernetes.install: $(OCTOPUS_TOOL)
 ##
 ## ROOK TARGETS
 ##   rook.help          Show all Rook targets
-export ROOK_SYSTEM_NAMESPACE ?= rook-ceph-system
+export ROOK_SYSTEM_NAMESPACE ?= rook-ceph
 export ROOK_NAMESPACE ?= rook-ceph
 include scripts/rook/Makefile
 
@@ -66,6 +67,11 @@ include scripts/rook/Makefile
 ##
 ## CEPH TARGETS
 ##   (not yet implemented)
+
+##
+## UPGRADE TARGETS
+##   upgrade.help       Show all upgrade targets
+include scripts/upgrade/Makefile
 
 
 # call.script.% SCRIPT=<script-path> - to call a single script with make's env vars set up

@@ -8,9 +8,9 @@ trap '' ERR
 
 echo ''
 echo 'DELETING ROOK RESOURCES'
-( cd ${ROOK_CONFIG_DIR}/ceph
+( cd "${ROOK_CONFIG_DIR}"/ceph
   for f in *.yaml; do
-    kubectl delete -f "${f}"
+    kubectl delete -f "${f}" --wait=false
   done
   # kubectl delete -f psp.yaml -f cluster.yaml -f operator.yaml -f storageclass.yaml \
   #   -f filesystem.yaml -f toolbox.yaml
