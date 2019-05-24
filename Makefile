@@ -30,7 +30,6 @@ cluster.destroy:
 	@ rm -f _node-list
 	@ rm -f $(KUBECONFIG)
 	@ $(MAKE) rook.destroy-hook.%
-	@ $(MAKE) upgrade.destroy-hook.%
 
 ##   cluster.setup      Set up the cluster's basic user tooling
 cluster.setup: $(OCTOPUS_TOOL)

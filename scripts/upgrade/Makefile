@@ -95,8 +95,3 @@ upgrade.restart-operator:
 .PHONY: upgrade.help
 # Use sed on this makefile to render all lines beginning with '##'
 upgrade.help: scripts/upgrade/Makefile.help
-
-
-upgrade.destroy-hook.%: upgrade.unset-to
-	@ rm -rf $(UPGRADE_FROM_CONFIG_DIR)
-	@ rm -rf $(UPGRADE_TO_CONFIG_DIR)

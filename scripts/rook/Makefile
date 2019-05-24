@@ -156,5 +156,5 @@ rook.restart-operator:
 rook.help: scripts/rook/Makefile.help
 
 
-rook.destroy-hook.%: rook.unset-config
+rook.destroy-hook.%:
 	@ rm -f $(CURRENT_BUILT_BRANCH_FILE)
