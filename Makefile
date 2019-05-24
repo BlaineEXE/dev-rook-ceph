@@ -14,12 +14,13 @@ include makelib.mk
 ##
 ## QUICKSTART
 ##   quickstart         Perform all steps to set up a Kubernetes cluster ready for Rook development
+##                          with params defined in ${FIL}developer-settings${NON}
 quickstart:
 	@ $(MAKE) cluster.build cluster.setup kubernetes.install
 
 ##
 ## CLUSTER TARGETS
-##   cluster.build      Stand up a cluster for development with params defined in ${GRN}developer-settings${NON}
+##   cluster.build      Stand up a cluster for development with params defined in ${FIL}developer-settings${NON}
 cluster.build:
 	@ $(SUDO) $(PYTHON) scripts/libvirt/apply.py
 	@ $(SUDO) $(PYTHON) scripts/libvirt/generate-node-list.py
@@ -45,7 +46,7 @@ cluster.setup: $(OCTOPUS_TOOL)
 
 ##
 ## KUBERNETES TARGETS
-##   kubernetes.install Install Kubernetes on the cluster with params defined in ${GRN}developer-settings${NON}
+##   kubernetes.install Install Kubernetes on the cluster with params defined in ${FIL}developer-settings${NON}
 kubernetes.install: $(OCTOPUS_TOOL)
 	@ $(BASH) scripts/kubernetes/install-kubeadm.sh
 	@ $(BASH) scripts/kubernetes/install-k8s.sh
@@ -65,7 +66,7 @@ include scripts/rook/Makefile
 
 ##
 ## CEPH TARGETS
-##   (not yet implemented)
+##   [not yet implemented]
 
 ##
 ## UPGRADE TARGETS

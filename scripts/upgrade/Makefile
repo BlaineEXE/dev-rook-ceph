@@ -5,22 +5,36 @@ UPGRADE_TO_CONFIG_DIR ?= $(PWD)/.upgrade-to-config
 UPGRADE_FROM_CONFIG_BRANCH_FILE := $(UPGRADE_FROM_CONFIG_DIR)/_current-config-branch
 UPGRADE_TO_CONFIG_BRANCH_FILE := $(UPGRADE_TO_CONFIG_DIR)/_current-config-branch
 
-## ABOUT
-##  Test Rook upgrades. Upgrade tooling is currently very much a work-in-progress.
-##  These will probably only work upgrading from Rook v0.9 to master.
-
 # Upgrades might have slightly different configs from the master branch when features change
 # Set overrides here for the upgrade environment
 upgrade.environment.%:
-	# e.g., $(eval VAR := newvalue)
+# e.g., $(eval VAR := newvalue)
 # Delete the below once upgrades are from v1.0?
 	$(eval MAKE := $(MAKE) ROOK_SYSTEM_NAMESPACE=rook-ceph-system)
 	$(eval BASH := ROOK_SYSTEM_NAMESPACE=rook-ceph-system $(BASH))
 
+## ABOUT
+##  Test Rook upgrades. Upgrade tooling is currently very much a work-in-progress.
+##  These will probably only work upgrading from Rook v0.9 to master.
+##
+## BASIC WORKFLOW
+##  Upgrades are done by first installing a before-upgrade Rook-Ceph using configs in a "from" branch.
+##  Rook may then be upgraded to a new version using configs in a "to" branch. Ceph may also be
+##  upgraded to a new version either before or after the Rook upgrade.
+##    1.  Store the before-upgrade configs      ${CMD}make upgrade.from${NON}  (from before-upgrade config branch)
+##    2.  Store the post-upgrade configs        ${CMD}make upgrade.to${NON}    (from post-upgrade config branch)
+##    3.  Build and push Rook images to hosts   ${CMD}make rook.build${NON}    (from working branch)
+##    4a. Kick off a Rook upgrade               ${CMD}make upgrade.rook${NON}                    (from any branch)
+##    4b. Kick off a Ceph upgrade               ${CMD}make upgrade.ceph NEW_CEPH_IMAGE=<?>${NON} (from any branch)
+##    5.  Manually verify the upgrade           ${BLD}DEV TARGETS${NON}                          (from any branch)
+##    6.  To iterate, repeat steps 3 onward
+##    7.  Uninstall before starting a new flow  ${CMD}make upgrade.uninstall${NON}               (from any branch)
+
+
 ##
 ## UPGRADE TARGETS
-##   upgrade.from       Just as with ${TGT}rook.set-config${NON}, set a Rook config branch for configuring
-##                          the before-upgrade cluster using the active Rook branch's configs.
+##   upgrade.from       Just as with ${TGT}rook.set-config${NON}, set configs for the before-upgrade cluster by
+##                          copying the current branch's configs to ${DIR}.upgrade-from-config/${NON}.
 $(UPGRADE_FROM_CONFIG_DIR): upgrade.environment.%
 	@ echo "  ERROR! No branch has been set to upgrade from."
 	@ exit 1
@@ -29,8 +43,8 @@ upgrade.from: upgrade.environment.%
 	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_FROM_CONFIG_DIR) rook.set-config.%
 	@ $(MAKE) upgrade.showinfo
 
-##   upgrade.to         Just as with ${TGT}rook.set-config${NON}, set a Rook config branch for configuring the
-##                          post-upgrade cluster using the active Rook branch's configs.
+##   upgrade.to         Just as with ${TGT}rook.set-config${NON}, set configs for the post-upgrade cluster by
+##                          copying the current branch's configs to ${DIR}.upgrade-to-config/${NON}.
 $(UPGRADE_TO_CONFIG_DIR): upgrade.environment.%
 	@ printf '  WARNING! No branch has been set to upgrade to\n'
 	@ printf '  using configs from the current branch: %s\n' "$$(git -C rook/ rev-parse --abbrev-ref HEAD)"
@@ -42,9 +56,9 @@ upgrade.to: upgrade.environment.%
 	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_TO_CONFIG_DIR) rook.set-config.%
 	@ $(MAKE) upgrade.showinfo
 
-##   upgrade.unset-to   Just as with ${TGT}rook.unset-config${NON}, remove the stored configs for configuring
-##                          the post-upgrade cluster. The post-upgrade cluster will always be
-##                          configured from manifests in the active branch.
+##   upgrade.unset-to   Just as with ${TGT}rook.unset-config${NON}, remove the stored post-upgrade cluster
+##                          configs, causing the post-upgrade cluster to always be configured from
+##                          manifests in the active branch.
 #  A 'from' branch is always required, so don't delete the from branch
 upgrade.unset-to: upgrade.environment.%
 	@ rm -rf $(UPGRADE_TO_CONFIG_DIR)
@@ -85,7 +99,6 @@ upgrade.showinfo: upgrade.environment.%
 ## DEV TARGETS
 ##  Because v1.0 changes the default Rook system namespace, these targets exist as a convenience for
 ##  using Rook dev targets in an upgrade context.
-##
 ##   upgrade.operator-logs    Print and continue following the Rook operator log.
 upgrade.operator-logs: upgrade.environment.%
 	@ $(MAKE) rook.operator-logs

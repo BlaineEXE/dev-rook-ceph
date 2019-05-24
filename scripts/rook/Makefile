@@ -3,17 +3,19 @@
 
 ##
 ## BASIC WORKFLOW
-##
 ##  This environment makes it possible to keep separate branches for config changes and code changes:
 ##    * 'config' branches with modified manifest files used for installing Rook with different
 ##      configurations. Rook manifests exist in ${DIR}rook/cluster/examples/kubernetes/ceph/${NON}.
 ##    * 'working' branches with code changes separate from any manifest file changes.
 ##
 ##  Using this pattern, a good dev workflow for Rook code is:
-##    1. Copy Rook's install config                 ${CMD}make rook.set-config${NON}   (from config branch)
-##    2. Build and push Rook images to hosts        ${CMD}make rook.build${NON}        (from working branch)
-##    3. Install Rook                               ${CMD}make rook.install${NON}      (from any branch)
-##    4. Uninstall Rook before using a new config   ${CMD}make rook.uninstall${NON}    (from any branch)
+##    1.  Copy Rook's install config                 ${CMD}make rook.set-config${NON}    (from config branch)
+##    2.  Build and push Rook images to hosts        ${CMD}make rook.build${NON}         (from working branch)
+##    3.  Install Rook                               ${CMD}make rook.install${NON}       (from any branch)
+##    4a. Verify the install manually                ${BLD}DEV TARGETS${NON}             (from any branch)
+##    4b. Run integration tests to verify            ${NON}[not yet implemented]${NON}   (from any branch)
+##    5.  Iterate on code/config changes             ${BLD}ROOK ITERATION TARGETS${NON}  (from any branch)
+##    6.  Uninstall Rook before starting a new flow  ${CMD}make rook.uninstall${NON}     (from any branch)
 
 # Targets followed by '%' are hidden from make's tab complete. These targets can be called via
 # `make target.%`; however, this is an advanced usage not documented in the help text.
@@ -97,6 +99,19 @@ rook.uninstall: rook.config-branch-file.%
 	@ sleep 10  # I think k8s needs time to flush the info from etcd
 	@ $(BASH) scripts/resources/success-message.sh "ROOK UN-INSTALLED"
 
+##   rook.test          Run unit tests on Rook.
+rook.test: rook.make.test
+	@ bash scripts/resources/success-message.sh "ROOK UNIT TESTS PASSED"
+
+##   rook.show-info     Print info about the current Rook install/config.
+rook.showinfo:
+	@ echo ''
+	@ $(MAKE) rook.print-config-branch.%
+	@ $(MAKE) rook.print-built-branch.%
+	@ echo ''
+
+##
+## ROOK ITERATION TARGETS
 ##   rook.reinstall     Uninstall and then re-install Rook with the same config and image.
 rook.reinstall: rook.uninstall rook.install
 
@@ -122,20 +137,8 @@ rook.rebuild:
 rook.reconfig: rook.uninstall rook.set-config rook.install rook.showinfo
 	@ bash scripts/resources/success-message.sh "ROOK IS REINSTALLED WITH A NEW CONFIG"
 
-##   rook.test          Run unit tests on Rook.
-rook.test: rook.make.test
-	@ bash scripts/resources/success-message.sh "ROOK UNIT TESTS PASSED"
-
-##   rook.show-info     Print info about the current Rook install/config.
-rook.showinfo:
-	@ echo ''
-	@ $(MAKE) rook.print-config-branch.%
-	@ $(MAKE) rook.print-built-branch.%
-	@ echo ''
-
 ##
 ## ROOK DEV/DEBUG TARGETS
-##
 ##   rook.toolbox-connect  Connect to the Rook toolbox.
 rook.toolbox-connect:
 	@ $(BASH) scripts/rook/toolbox-connect.sh
