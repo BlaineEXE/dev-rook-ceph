@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source scripts/shared.sh
+
 echo -n "Untainting master node(s) ... "
 
 noschedule_nodes="$(kubectl get nodes -o json | \
