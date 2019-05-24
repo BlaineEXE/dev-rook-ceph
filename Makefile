@@ -40,7 +40,6 @@ cluster.setup: $(OCTOPUS_TOOL)
 	@ $(BASH) scripts/cluster/set-iptables-permissive.sh
 	@ $(BASH) scripts/cluster/exercise-ssh.sh
 	@ $(BASH) scripts/cluster/setup-bashrc.sh
-	@ # reboot?
 	@ $(BASH) scripts/cluster/verify.sh
 
 
@@ -50,6 +49,7 @@ cluster.setup: $(OCTOPUS_TOOL)
 kubernetes.install: $(OCTOPUS_TOOL)
 	@ $(BASH) scripts/kubernetes/install-kubeadm.sh
 	@ $(BASH) scripts/kubernetes/install-k8s.sh
+	@ $(BASH) scripts/kubernetes/download-kubeconfig.sh
 	@ $(BASH) scripts/kubernetes/wait-for-up.sh
 	@ $(BASH) scripts/kubernetes/untaint-master.sh
 	@ $(BASH) scripts/kubernetes/verify.sh

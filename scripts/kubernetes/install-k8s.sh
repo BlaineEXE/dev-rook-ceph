@@ -48,9 +48,4 @@ join_command="$(${OCTOPUS} --host-groups first_master run \
 suppress_output_unless_error "${OCTOPUS} --host-groups workers run \
   'if ! docker ps -a | grep -q kube; then ${join_command} ; fi'"
 
-echo "  downloading the admin kubeconfig file locally ..."
-scp -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-    -i "${PWD}"/scripts/resources/.ssh/id_rsa \
-  root@"${first_master}":/root/.kube/config kubeconfig
-
 echo "... done."
