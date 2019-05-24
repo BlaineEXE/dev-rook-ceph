@@ -40,9 +40,14 @@ suppress_output_unless_error "${OCTOPUS} --host-groups all run \
   'zypper --non-interactive --gpg-auto-import-keys \
     remove -y \
       firewalld \
-  '"
+  ' || true"
+  # '|| true' b/c this fails if anti-deps already removed and is unlikely to fail otherwise
 
 echo -n "Enabling docker ..."
 # enable and start docker service
 suppress_output_unless_error "${OCTOPUS} --host-groups all run 'systemctl enable --now docker'"
 echo "done."
+
+echo -n "Rebooting nodes ..."
+${OCTOPUS} --host-groups all run reboot || true # will fail b/c conn will be lost
+${BASH} scripts/cluster/wait-for-up.sh
