@@ -147,6 +147,10 @@ rook.toolbox-connect:
 rook.operator-logs:
 	@ $(BASH) scripts/rook/follow-operator-log.sh
 
+##   rook.dashboard-fwd    Port forward the Ceph dashboard service to localhost.
+rook.dashboard-fwd:
+	@ $(BASH) scripts/rook/dashboard-port-forward.sh
+
 ##   rook.restart-operator Restart the rook operator by deleting the pod.
 rook.restart-operator:
 	@ $(BASH) scripts/rook/restart-operator.sh
