@@ -119,7 +119,7 @@ rook.reinstall: rook.uninstall rook.install
 ##                          pushed, the operator pod is restarted to run the new version. Useful for
 ##                          quickly iterating on Rook code changes.
 rook.replace: rook.build
-	@ $(BASH) scripts/rook/restart-operator.sh"
+	@ $(BASH) scripts/rook/restart-operator.sh
 	@ $(MAKE) rook.showinfo
 	@ bash scripts/resources/success-message.sh "ROOK IS REBUILT IN-PLACE"
 
