@@ -155,6 +155,10 @@ rook.dashboard-fwd:
 rook.restart-operator:
 	@ $(BASH) scripts/rook/restart-operator.sh
 
+##   rook.watch-pods       Watch Rook pods with `watch`
+rook.watch-pods:
+	@ watch kubectl --namespace $(ROOK_NAMESPACE) get pods
+
 #
 # Help
 #
