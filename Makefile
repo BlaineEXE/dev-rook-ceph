@@ -35,7 +35,7 @@ cluster.destroy:
 ##   cluster.setup      Set up the cluster's basic user tooling
 cluster.setup: $(OCTOPUS_TOOL)
 	@ $(BASH) scripts/cluster/wait-for-up.sh
-	@ $(BASH) scripts/clsuter/chown-ssh-keys.sh
+	@ $(BASH) -c "chmod 600 scripts/resources/.ssh/id_rsa"
 	@ $(BASH) scripts/cluster/config-octopus.sh
 	@ $(BASH) scripts/cluster/copy-octopus-to-cluster.sh
 	@ $(BASH) scripts/cluster/install-dependencies.sh
