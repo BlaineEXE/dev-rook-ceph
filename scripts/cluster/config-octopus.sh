@@ -5,8 +5,8 @@ echo -n "Generating Octopus config ... "
 
 mkdir -p .octopus/
 cat > .octopus/config.yaml << EOF
-# As long as octopus is run from the rasputin dir,
-# it will reference the rasputin nodes.
+# As long as octopus is run from the root dir,
+# it will reference the root nodes.
 
 # Set our default keyfile
 identity-file: "${PWD}/scripts/resources/.ssh/id_rsa"

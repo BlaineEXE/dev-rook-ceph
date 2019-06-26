@@ -10,5 +10,7 @@ filename="$(basename ${OCTOPUS_TOOL})"
 suppress_output_unless_error "${OCTOPUS} --host-groups all copy ${OCTOPUS_TOOL} /root/bin/"
 suppress_output_unless_error "${OCTOPUS} --host-groups all run 'mv /root/bin/${filename} /root/bin/octopus'"
 suppress_output_unless_error "${OCTOPUS} --host-groups all copy --recursive _node-list /root/"
+suppress_output_unless_error "${OCTOPUS} --host-groups all run \
+  'mkdir -p /root/.octopus && octopus completion > /root/.octopus/octopus-completion.sh'"
 
 echo "done."

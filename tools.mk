@@ -5,7 +5,7 @@ $(shell mkdir -p $(TOOLS_DIR) > /dev/null)
 # Octopus
 #
 
-export OCTOPUS_VERSION ?= v1.1.0
+export OCTOPUS_VERSION ?= v2.0.0
 export OCTOPUS_TOOL := $(TOOLS_DIR)/octopus-$(OCTOPUS_VERSION)
 
 # Make sure octopus tool exists for use from the local dev environment

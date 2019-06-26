@@ -33,31 +33,31 @@ for n in nodes:
     ip = leases[n.name]
     # make an entry for each hostname
     saniName = re.sub("[\W]+", "_", n.name)
-    convenienceTxt += "{}=\"{}\"\n".format(saniName, ip)
+    convenienceTxt += "export {}=\"{}\"\n".format(saniName, ip)
     if "master" in n.name:
         masterIPs += [ip]
     elif "worker" in n.name:
         workerIPs += [ip]
 
 
-fileTxt += "\nmasters=\""
+fileTxt += "\nexport masters=\""
 for ip in masterIPs:
     fileTxt += ip + "\n"
 fileTxt = fileTxt.rstrip("\n")
 fileTxt += "\""
 fileTxt += "\n"
 
-fileTxt += "\nworkers=\""
+fileTxt += "\nexport workers=\""
 for ip in workerIPs:
     fileTxt += ip + "\n"
 fileTxt = fileTxt.rstrip("\n")
 fileTxt += "\""
 fileTxt += "\n"
 
-fileTxt += """\nall=\"${masters} ${workers}\"
+fileTxt += """\nexport all=\"${masters} ${workers}\"
 
-first_master=\"${masters%%[$'\\n' ]*}\"
-noninitial_masters=\"${masters/$first_master/}\"
+export first_master=\"${masters%%[$'\\n' ]*}\"
+export noninitial_masters=\"${masters/$first_master/}\"
 """
 
 fileTxt += """
