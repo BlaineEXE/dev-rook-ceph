@@ -49,5 +49,5 @@ suppress_output_unless_error "${OCTOPUS} --host-groups all run 'systemctl enable
 echo "done."
 
 echo -n "Rebooting nodes ..."
-${OCTOPUS} --host-groups all run reboot || true # will fail b/c conn will be lost
+${OCTOPUS} --host-groups all run reboot &>/dev/null || true # will fail b/c conn will be lost
 ${BASH} scripts/cluster/wait-for-up.sh
