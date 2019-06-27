@@ -95,8 +95,8 @@ rook.install: rook.config-branch-file.%
 ##                          config files. Run this target before copying new configs.
 rook.uninstall: rook.config-branch-file.%
 	@ $(BASH) scripts/rook/uninstall.sh
-	@ $(MAKE) rook.showinfo
 	@ sleep 10  # I think k8s needs time to flush the info from etcd
+	@ $(MAKE) rook.showinfo
 	@ $(BASH) scripts/resources/success-message.sh "ROOK UN-INSTALLED"
 
 ##   rook.test          Run unit tests on Rook.
