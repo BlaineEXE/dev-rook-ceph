@@ -157,7 +157,7 @@ rook.restart-operator:
 
 ##   rook.watch-pods       Watch Rook pods with `watch`
 rook.watch-pods:
-	@ watch kubectl --namespace $(ROOK_NAMESPACE) get pods
+	@ watch --no-title kubectl --namespace $(ROOK_NAMESPACE) get pods
 
 #
 # Help
