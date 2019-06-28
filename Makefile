@@ -1,5 +1,8 @@
 include makelib.mk
 
+# Make sure git doesn't track others' changes to developer-settings
+$(shell git update-index --assume-unchanged developer-settings)
+
 # The theory behind makefile targets is that targets (or target groups) should not share the same
 # 3 letters so tab complete is useful for the user. Ideally, the first 2 letters.
 
