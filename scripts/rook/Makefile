@@ -38,7 +38,44 @@ rook.make.%: $(GO_TOOL) rook.symlink.%
 	@ $(BASH) scripts/rook/make-ceph.sh $*
 
 ##
-## ROOK BUILD/INSTALL TARGETS
+## ROOK BUILD/TEST TARGETS
+
+##   rook.build         Build Rook locally, and push the Rook image to nodes as 'rook/rook:master'
+# Store branch name from most recent image built and pushed to nodes so we can print it for the user
+# Makefile is more complicated, but gives the dev important reminder about what is being installed
+$(CURRENT_BUILT_BRANCH_FILE):
+	@ echo '  WARNING! There is no record of a built image pushed to nodes'
+	@ echo '  This is not an error if the config file specifies an upstream image'
+rook.print-built-branch.%:
+	@ echo "  CURRENT BUILT BRANCH: $$(cat $(CURRENT_BUILT_BRANCH_FILE) 2> /dev/null)"
+rook.build: rook.symlink.%
+	@ printf "\n  BUILDING ROOK BRANCH %s\n" "$$(git -C rook/ rev-parse --abbrev-ref HEAD)"
+	@ $(MAKE) rook.make.build
+	@ $(BASH) scripts/rook/push.sh
+	@ git -C rook/ rev-parse --abbrev-ref HEAD > $(CURRENT_BUILT_BRANCH_FILE) # store branch
+	@ bash scripts/resources/success-message.sh "ROOK BUILT"
+	@ $(MAKE) rook.showinfo
+
+##   rook.test          Run unit tests on Rook.
+rook.test: rook.make.test
+	@ bash scripts/resources/success-message.sh "ROOK UNIT TESTS PASSED"
+
+##   rook.integration   Run Rook integration tests. Specify a specific test by setting the TEST env
+##                        variable. See possible tests with ${CMD}make rook.integration?${NON}.
+TEST ?= .*
+rook.integration:
+# Integration tests don't (yet?) include PSP setup, so permit all things for integration tests
+	@ kubectl apply -f scripts/kubernetes/permissive-default-psp.yaml
+	@ rm -f rook/_output/tests/*.log
+	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.run $(TEST) || true # continue to set PSP back
+	@ echo "Test outputs are in rook/_output/tests"
+	@ kubectl apply -f scripts/kubernetes/cluster-psp.yaml
+rook.integration?:
+	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.list '.*'
+
+
+##
+## ROOK INSTALL TARGETS
 
 ##   rook.set-config    Set the config branch by copying the current Rook branch's manifest files to
 ##                          ${DIR}.rook-config/${NON}. This allows you to have a consistent Rook
@@ -67,25 +104,11 @@ rook.set-config: rook.set-config.%
 rook.unset-config:
 	@ rm -rf $(ROOK_CONFIG_DIR) # contains CURRENT_CONFIG_BRANCH_FILE
 
-##   rook.build         Build Rook locally, and push the Rook image to nodes as 'rook/rook:master'
-# Store branch name from most recent image built and pushed to nodes so we can print it for the user
-# Makefile is more complicated, but gives the dev important reminder about what is being installed
-$(CURRENT_BUILT_BRANCH_FILE):
-	@ echo '  WARNING! There is no record of a built image pushed to nodes'
-	@ echo '  This is not an error if the config file specifies an upstream image'
-rook.print-built-branch.%:
-	@ echo "  CURRENT BUILT BRANCH: $$(cat $(CURRENT_BUILT_BRANCH_FILE) 2> /dev/null)"
-rook.build: rook.symlink.%
-	@ printf "\n  BUILDING ROOK BRANCH %s\n" "$$(git -C rook/ rev-parse --abbrev-ref HEAD)"
-	@ $(MAKE) rook.make.build
-	@ $(BASH) scripts/rook/push.sh
-	@ git -C rook/ rev-parse --abbrev-ref HEAD > $(CURRENT_BUILT_BRANCH_FILE) # store branch
-	@ bash scripts/resources/success-message.sh "ROOK BUILT"
-	@ $(MAKE) rook.showinfo
-
 ##   rook.install       Install Rook on the cluster with the config files set via ${TGT}rook.set-config${NON}
 ##                          OR uses the active branch's config if a config branch is unset or not set.
 rook.install: rook.config-branch-file.%
+# Always install with default PSPs enabled (could be changed by rook.integration)
+	@ kubectl apply -f scripts/kuberentes/cluster-psp.yaml
 	@ $(BASH) scripts/rook/install.sh
 	@ $(BASH) scripts/rook/install-filesystem.sh
 	@ $(BASH) scripts/resources/success-message.sh "ROOK INSTALLED"
@@ -98,10 +121,6 @@ rook.uninstall: rook.config-branch-file.%
 	@ sleep 10  # I think k8s needs time to flush the info from etcd
 	@ $(MAKE) rook.showinfo
 	@ $(BASH) scripts/resources/success-message.sh "ROOK UN-INSTALLED"
-
-##   rook.test          Run unit tests on Rook.
-rook.test: rook.make.test
-	@ bash scripts/resources/success-message.sh "ROOK UNIT TESTS PASSED"
 
 ##   rook.show-info     Print info about the current Rook install/config.
 rook.showinfo:
