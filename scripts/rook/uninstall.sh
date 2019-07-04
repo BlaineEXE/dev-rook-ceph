@@ -25,9 +25,7 @@ ${OCTOPUS} --host-groups all run \
    dir=/var/lib/rook ; rm -rf "$dir"/* ; echo "$dir contents:" ; cd "$dir" 2>/dev/null && ls
    exit 0'
 
-# disk wiping is complicated, so copy the script to the nodes, then execute that
-${OCTOPUS} --host-groups all copy scripts/rook/rook-disk-wipe-runner.sh /root
-${OCTOPUS} --host-groups all run "${BASH} /root/rook-disk-wipe-runner.sh"
+${BASH} scripts/rook/wipe-disks.sh
 
 # Sometimes the ceph cluster CRD gets stuck in a state where it can't be deleted
 kubectl patch crd/cephclusters.ceph.rook.io -p '{"metadata":{"finalizers":[]}}' --type=merge

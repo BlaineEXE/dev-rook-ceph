@@ -12,5 +12,6 @@
 
 /rook
 /scripts/rook/_*
+/_output
 
 __pycache__

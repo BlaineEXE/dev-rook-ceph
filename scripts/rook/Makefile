@@ -66,13 +66,13 @@ TEST ?= .*
 rook.integration:
 # Integration tests don't (yet?) include PSP setup, so permit all things for integration tests
 	@ kubectl apply -f scripts/kubernetes/permissive-default-psp.yaml
-	@ rm -f rook/_output/tests/*.log
+	@ rm -f _output/tests/*.log
 	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.run $(TEST) || true # continue to set PSP back
-	@ echo "Test outputs are in rook/_output/tests"
+	@ echo "Test outputs are in _output/tests"
 	@ kubectl apply -f scripts/kubernetes/cluster-psp.yaml
+	@ $(BASH) scripts/rook/wipe-disks.sh
 rook.integration?:
 	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.list '.*'
-
 
 ##
 ## ROOK INSTALL TARGETS
