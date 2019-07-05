@@ -29,7 +29,8 @@ suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
 suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
   'kubectl completion bash > ~/.kube/kubectl-completion.sh && chmod +x ~/.kube/kubectl-completion.sh'"
 
-wait_for "kubernetes master services to be ready" 90 "kubectl get nodes"
+wait_for "kubernetes master services to be ready" 90 "${OCTOPUS} --host-groups first_master run \
+  'kubectl get nodes'"
 
 echo "  setting up default cluster pod security policies (PSPs) ..."
 suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
