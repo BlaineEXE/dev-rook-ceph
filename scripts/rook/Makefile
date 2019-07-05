@@ -108,7 +108,7 @@ rook.unset-config:
 ##                          OR uses the active branch's config if a config branch is unset or not set.
 rook.install: rook.config-branch-file.%
 # Always install with default PSPs enabled (could be changed by rook.integration)
-	@ kubectl apply -f scripts/kuberentes/cluster-psp.yaml
+	@ kubectl apply -f scripts/kubernetes/cluster-psp.yaml
 	@ $(BASH) scripts/rook/install.sh
 	@ $(BASH) scripts/rook/install-filesystem.sh
 	@ $(BASH) scripts/resources/success-message.sh "ROOK INSTALLED"
