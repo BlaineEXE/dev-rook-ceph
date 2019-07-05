@@ -42,6 +42,7 @@ suppress_output_unless_error "${OCTOPUS} --host-groups all run \
       firewalld \
   ' || true"
   # '|| true' b/c this fails if anti-deps already removed and is unlikely to fail otherwise
+echo "done."
 
 echo -n "Enabling docker ..."
 # enable and start docker service
