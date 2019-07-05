@@ -29,13 +29,14 @@ suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
 suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
   'kubectl completion bash > ~/.kube/kubectl-completion.sh && chmod +x ~/.kube/kubectl-completion.sh'"
 
+wait_for "kubernetes master services to be ready" 90 "kubectl get nodes"
+
 echo "  setting up default cluster pod security policies (PSPs) ..."
 suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
   'kubectl apply -f ${kube_setup_dir}/cluster-psp.yaml'"
 
 echo "  setting up cluster overlay network CNI ..."
 # Cilium runs its own etcd which we want to be able to run on the master
-wait_for "kubernetes master services to be ready" 90
 ${BASH} scripts/kubernetes/untaint-master.sh
 suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
    'kubectl apply -f https://raw.githubusercontent.com/cilium/cilium/v1.5/examples/kubernetes/1.14/cilium.yaml'"
