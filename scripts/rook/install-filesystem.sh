@@ -9,7 +9,7 @@ echo 'SETTING UP CEPHFS AND INSTALLING MDSES'
 )
 
 # Wait for 2 mdses to start
-wait_for "mdses to start" 60 \
+wait_for "mdses to start" 90 \
   "kubectl get --namespace ${ROOK_NAMESPACE} pods | grep -q 'rook-ceph-mds-myfs-b.*Running'"
 
 # Test the FS in a mon pod
