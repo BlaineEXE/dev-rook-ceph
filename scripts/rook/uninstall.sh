@@ -27,10 +27,18 @@ ${OCTOPUS} --host-groups all run \
 
 ${BASH} scripts/rook/wipe-disks.sh
 
-# Sometimes the ceph cluster CRD gets stuck in a state where it can't be deleted
+# Wait for Rook's namespaces to be deleted before returning success
+# rook-ceph can take a long time to terminate
+wait_for "Rook resources to be deleted" 200 \
+  "! kubectl get namespaces | grep -q -e 'rook-ceph-system' -e 'rook-ceph'"
+
+# Sometimes the ceph cluster CRD gets stuck in a state where it can't be deleted; try this if we've
+# already waited a while without deletion succeeding
 kubectl patch crd/cephclusters.ceph.rook.io -p '{"metadata":{"finalizers":[]}}' --type=merge
+sleep 3
+kubectl delete crd/cephcluster.ceph.rook.io --wait=false
 
 # Wait for Rook's namespaces to be deleted before returning success
 # rook-ceph can take a long time to terminate
-wait_for "Rook resources to be deleted" 300 \
+wait_for "Rook resources to be deleted" 100 \
   "! kubectl get namespaces | grep -q -e 'rook-ceph-system' -e 'rook-ceph'"
