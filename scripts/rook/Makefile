@@ -23,9 +23,13 @@
 
 ROOK_REPO_DIR ?= $(GOPATH)/src/github.com/rook/rook
 ROOK_CONFIG_DIR ?= $(PWD)/.rook-config
-CURRENT_CONFIG_BRANCH_FILE := $(ROOK_CONFIG_DIR)/_current-config-branch
-CURRENT_BUILT_BRANCH_FILE := scripts/rook/_current-built-branch
+override CURRENT_CONFIG_BRANCH_FILE := $(ROOK_CONFIG_DIR)/_current-config-branch
+override CURRENT_BUILT_BRANCH_FILE := scripts/rook/_current-built-branch
 
+ifdef NOPUSH
+# if not pushing, define the var with a message to be used later
+override NOPUSH = (NOT PUSHING BUILT IMAGES TO DEV CLUSTER)
+endif
 
 # make a symlink from the rook repo in the user's go path to here for easy access
 rook.symlink.%:
@@ -49,7 +53,7 @@ $(CURRENT_BUILT_BRANCH_FILE):
 rook.print-built-branch.%:
 	@ echo "  CURRENT BUILT BRANCH: $$(cat $(CURRENT_BUILT_BRANCH_FILE) 2> /dev/null)"
 rook.build: rook.symlink.%
-	@ printf "\n  BUILDING ROOK BRANCH %s\n" "$$(git -C rook/ rev-parse --abbrev-ref HEAD)"
+	@ printf "\n  BUILDING ROOK BRANCH %s $(NOPUSH)\n" "$$(git -C rook/ rev-parse --abbrev-ref HEAD)"
 	@ $(MAKE) rook.make.build
 ifndef NOPUSH
 	@ $(BASH) scripts/rook/push.sh
