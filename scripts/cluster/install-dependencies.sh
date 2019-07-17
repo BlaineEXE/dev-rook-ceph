@@ -49,6 +49,10 @@ echo -n "Enabling docker ..."
 suppress_output_unless_error "${OCTOPUS} --host-groups all run 'systemctl enable --now docker'"
 echo "done."
 
+echo -n "Raising max open files ..."
+suppress_output_unless_error "${OCTOPUS} --host-groups all run 'sysctl -w fs.file-max=1200000'"
+echo "done."
+
 echo -n "Rebooting nodes ..."
 ${OCTOPUS} --host-groups all run reboot &>/dev/null || true # will fail b/c conn will be lost
 ${BASH} scripts/cluster/wait-for-up.sh
