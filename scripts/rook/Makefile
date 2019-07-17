@@ -51,8 +51,10 @@ rook.print-built-branch.%:
 rook.build: rook.symlink.%
 	@ printf "\n  BUILDING ROOK BRANCH %s\n" "$$(git -C rook/ rev-parse --abbrev-ref HEAD)"
 	@ $(MAKE) rook.make.build
+ifndef NOPUSH
 	@ $(BASH) scripts/rook/push.sh
 	@ git -C rook/ rev-parse --abbrev-ref HEAD > $(CURRENT_BUILT_BRANCH_FILE) # store branch
+endif
 	@ bash scripts/resources/success-message.sh "ROOK BUILT"
 	@ $(MAKE) rook.showinfo
 
