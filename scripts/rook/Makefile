@@ -67,11 +67,11 @@ rook.test: rook.make.test
 TEST ?= .*
 rook.integration:
 # Integration tests don't (yet?) include PSP setup, so permit all things for integration tests
-	@ kubectl apply -f scripts/kubernetes/permissive-default-psp.yaml
+#	@ kubectl apply -f scripts/kubernetes/permissive-default-psp.yaml
 	@ rm -f _output/tests/*.log
-	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.run $(TEST) || true # continue to set PSP back
+	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.run $(TEST) # || true # continue to set PSP back
 	@ echo "Test outputs are in _output/tests"
-	@ kubectl apply -f scripts/kubernetes/cluster-psp.yaml
+#	@ kubectl apply -f scripts/kubernetes/cluster-psp.yaml
 	@ $(BASH) scripts/rook/wipe-disks.sh
 rook.integration?:
 	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.list '.*'
@@ -110,7 +110,7 @@ rook.unset-config:
 ##                          OR uses the active branch's config if a config branch is unset or not set.
 rook.install: rook.config-branch-file.%
 # Always install with default PSPs enabled (could be changed by rook.integration)
-	@ kubectl apply -f scripts/kubernetes/cluster-psp.yaml
+#	@ kubectl apply -f scripts/kubernetes/cluster-psp.yaml
 	@ $(BASH) scripts/rook/install.sh
 	@ $(BASH) scripts/rook/install-filesystem.sh
 	@ $(BASH) scripts/resources/success-message.sh "ROOK INSTALLED"
