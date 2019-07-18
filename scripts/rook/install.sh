@@ -9,19 +9,22 @@ root_dir="${PWD}"
 
 echo ''
 echo 'INSTALLING CEPH'
+
+DEFAULT_PSP="${root_dir}/scripts/rook/default-psp.yaml"
+
 ( cd "${ROOK_CONFIG_DIR}"/ceph
-  # if [[ ! -s psp.yaml ]]; then
-  #   default_psp="${root_dir}/scripts/rook/default-psp.yaml"
-  #   echo "  WARNING! The current config branch lacks a 'psp.yaml' file."
-  #   echo "           Using the dev-rook-ceph default '${default_psp}'."
-  #   cp "${default_psp}" psp.yaml
-  # fi
   if [[ -s common.yaml ]]; then
-    # does not exist for v0.9
+    # common.yaml does not exist for v0.9
     kubectl apply -f common.yaml
   fi
-  if [[ -s psp.yaml ]]; then
-    # does not exist after psp added to common.yaml
+  if ! grep -q 'kind: PodSecurityPolicy' common.yaml 2>/dev/null ; then
+    # pod security policies were added into common.yaml for v1.1, so if common doesn't exist or
+    # doesn't have psp info, we need to use a psp.yaml file
+    if [ ! -f psp.yaml ]; then
+      echo "  WARNING! The current config branch lacks a 'psp.yaml' file."
+      echo "           Using the dev-rook-ceph default '${DEFAULT_PSP}'."
+      cp "${DEFAULT_PSP}" psp.yaml
+    fi
     kubectl apply -f psp.yaml
   fi
   kubectl apply -f operator.yaml
