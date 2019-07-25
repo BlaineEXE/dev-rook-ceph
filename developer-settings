@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-source _default-dev-settings
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "${SCRIPT_DIR}/_default-dev-settings"
 
 # Add your own overrides to the default-dev-settings here
 # examples:
