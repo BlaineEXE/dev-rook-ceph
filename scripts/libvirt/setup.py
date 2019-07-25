@@ -25,6 +25,11 @@ osImageName = virsh.DownloadImageToVolume(LIBVIRT_URI, NODE_OS_IMAGE, LIBVIRT_IM
 # networks
 #
 
+if CLUSTER_PREFIX.startswith('-'):
+    # libvirt dnsmasq does not allow the domain to start with a '-' char
+    print("CLUSTER_PREFIX cannot start with a '-' char", file=sys.stderr)
+    exit(1)
+
 FULL_NET_DOMAIN_NAME = CLUSTER_PREFIX + NET_DOMAIN_NAME
 
 k8sNet = network.LvmNetwork( # k8s network / main network

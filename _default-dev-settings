@@ -6,7 +6,8 @@
 
 # Prevent cluster collisions in shared environments with a resource name prefix
 # Can safely be commented-out for local libvirt use
-export CLUSTER_PREFIX="$USER-"
+export USER=$(whoami || echo "default-user")
+export CLUSTER_PREFIX="${USER}-"
 
 # Number of Kubernetes master and worker nodes to create for the dev cluster
 # One-node clusters should be a single master with no workers.
