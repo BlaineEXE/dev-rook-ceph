@@ -134,7 +134,7 @@ rook.uninstall: rook.config-branch-file.%
 	@ $(MAKE) rook.showinfo
 	@ $(BASH) scripts/resources/success-message.sh "ROOK UN-INSTALLED"
 
-##   rook.show-info     Print info about the current Rook install/config.
+##   rook.showinfo     Print info about the current Rook install/config.
 rook.showinfo:
 	@ echo ''
 	@ $(MAKE) rook.print-config-branch.%
