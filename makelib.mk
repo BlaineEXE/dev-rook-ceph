@@ -32,9 +32,8 @@ RED=\e[31m
 GRN=\e[32m
 ORG=\e[33m
 BLU=\e[34m
-# bold
+# format ...
 BLD=\e[1m
-# italic
 ITL=\e[3m
 # style usages ...
 CMD=$(RED)
@@ -44,6 +43,7 @@ DIR=$(BLU)
 HDR=$(BLD)
 ENV=$(BLD)
 VAL=$(BLD)
+IMG=$(ITL)
 
 # help target allows self-documenting makefiles
 %.help:

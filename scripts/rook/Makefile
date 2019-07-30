@@ -12,7 +12,7 @@
 ##    1.  Copy Rook's install config                 ${CMD}make rook.set-config${NON}    (from config branch)
 ##    2.  Build and push Rook images to hosts        ${CMD}make rook.build${NON}         (from working branch)
 ##    3.  Install Rook                               ${CMD}make rook.install${NON}       (from any branch)
-##    4a. Verify the install manually                ${BLD}DEV TARGETS${NON}             (from any branch)
+##    4a. Verify the install manually                ${BLD}ROOK DEV/DEBUG TARGETS${NON}  (from any branch)
 ##    4b. Run integration tests to verify            ${NON}[not yet implemented]${NON}   (from any branch)
 ##    5.  Iterate on code/config changes             ${BLD}ROOK ITERATION TARGETS${NON}  (from any branch)
 ##    6.  Uninstall Rook before starting a new flow  ${CMD}make rook.uninstall${NON}     (from any branch)
@@ -26,10 +26,6 @@ ROOK_CONFIG_DIR ?= $(PWD)/.rook-config
 override CURRENT_CONFIG_BRANCH_FILE := $(ROOK_CONFIG_DIR)/_current-config-branch
 override CURRENT_BUILT_BRANCH_FILE := scripts/rook/_current-built-branch
 
-ifdef NOPUSH
-# if not pushing, define the var with a message to be used later
-override NOPUSH = (NOT PUSHING BUILT IMAGES TO DEV CLUSTER)
-endif
 
 # make a symlink from the rook repo in the user's go path to here for easy access
 rook.symlink.%:
@@ -44,7 +40,18 @@ rook.make.%: $(GO_TOOL) rook.symlink.%
 ##
 ## ROOK BUILD/TEST TARGETS
 
-##   rook.build         Build Rook locally, and push the Rook image to nodes as 'rook/rook:master'
+##   rook.build         Build Rook locally, and push the Rook image to nodes as ${IMG}rook/rook:master${NON}
+##   rook.build.nopush  Build Rook locally, but do not push the Rook image to nodes
+rook.build: rook.symlink.%
+	@ $(MAKE) rook.build.startmsg.%
+	@ $(MAKE) rook.make.build
+	@ $(MAKE) rook.build.setinfo.%
+	@ $(MAKE) rook.build.showinfo.%
+rook.build.nopush: rook.symlink.%
+	@ $(MAKE) rook.build.startmsg.%
+	@ echo '    (NOT PUSHING BUILT IMAGES TO DEV CLUSTER)'
+	@ $(MAKE) rook.make.build
+	@ $(MAKE) rook.build.showinfo.%
 # Store branch name from most recent image built and pushed to nodes so we can print it for the user
 # Makefile is more complicated, but gives the dev important reminder about what is being installed
 $(CURRENT_BUILT_BRANCH_FILE):
@@ -52,22 +59,22 @@ $(CURRENT_BUILT_BRANCH_FILE):
 	@ echo '  This is not an error if the config file specifies an upstream image'
 rook.print-built-branch.%:
 	@ echo "  CURRENT BUILT BRANCH: $$(cat $(CURRENT_BUILT_BRANCH_FILE) 2> /dev/null)"
-rook.build: rook.symlink.%
-	@ printf "\n  BUILDING ROOK BRANCH %s $(NOPUSH)\n" "$$(git -C rook/ rev-parse --abbrev-ref HEAD)"
-	@ $(MAKE) rook.make.build
-ifndef NOPUSH
+rook.build.setinfo.%:
 	@ $(BASH) scripts/rook/push.sh
 	@ git -C rook/ rev-parse --abbrev-ref HEAD > $(CURRENT_BUILT_BRANCH_FILE) # store branch
-endif
+rook.build.showinfo.%:
 	@ bash scripts/resources/success-message.sh "ROOK BUILT"
 	@ $(MAKE) rook.showinfo
+rook.build.startmsg.%:
+	@ printf "\n  BUILDING ROOK BRANCH %s\n" "$$(git -C rook/ rev-parse --abbrev-ref HEAD)"
 
 ##   rook.test          Run unit tests on Rook.
 rook.test: rook.make.test
 	@ bash scripts/resources/success-message.sh "ROOK UNIT TESTS PASSED"
 
 ##   rook.integration   Run Rook integration tests. Specify a specific test by setting the TEST env
-##                        variable. See possible tests with ${CMD}make rook.integration?${NON}.
+##                          variable. Uses the pushed ${IMG}rook/rook:master${NON} image.
+##                          See possible tests with ${CMD}make rook.integration?${NON}.
 TEST ?= .*
 rook.integration:
 	@ rm -f _output/tests/*.log
@@ -76,6 +83,9 @@ rook.integration:
 	@ $(BASH) scripts/rook/wipe-disks.sh
 rook.integration?:
 	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.list '.*'
+
+##   rook.unpush        Remove the pushed ${IMG}rook/rook:master${NON} image from nodes so that installs and
+##                          tests will use the upstream image.
 
 ##
 ## ROOK INSTALL TARGETS
