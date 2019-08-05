@@ -66,6 +66,9 @@ kubernetes.install: $(OCTOPUS_TOOL)
 export ROOK_SYSTEM_NAMESPACE ?= rook-ceph
 export ROOK_NAMESPACE ?= rook-ceph
 include scripts/rook/Makefile
+.PHONY: rook
+rook:
+	@ $(MAKE) rook.help
 
 
 ##
