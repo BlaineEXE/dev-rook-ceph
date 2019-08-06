@@ -20,7 +20,6 @@ local="${KUBERNETES_DASHBOARD_LOCAL_PORT}"
 
 echo ""
 echo "  Dashboard addr: https://127.0.0.1:${local}"
-echo "  Dashboard user: admin"
 echo "  Dashboard token: ${token}"
 echo "  Use Ctrl-C to stop port forwarding when you are done."
 echo ""
