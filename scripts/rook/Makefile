@@ -12,9 +12,9 @@
 ##    1.  Copy Rook's install config                 ${CMD}make rook.set-config${NON}    (from config branch)
 ##    2.  Build and push Rook images to hosts        ${CMD}make rook.build${NON}         (from working branch)
 ##    3.  Install Rook                               ${CMD}make rook.install${NON}       (from any branch)
-##    4a. Verify the install manually                ${BLD}ROOK DEV/DEBUG TARGETS${NON}  (from any branch)
-##    4b. Run integration tests to verify            ${NON}[not yet implemented]${NON}   (from any branch)
-##    5.  Iterate on code/config changes             ${BLD}ROOK ITERATION TARGETS${NON}  (from any branch)
+##    4a. Verify the install manually                ${HDR}ROOK DEV/DEBUG TARGETS${NON}  (from any branch)
+##    4b. Run integration tests to verify            ${CMD}make rook.integration${NON}   (from any branch)
+##    5.  Iterate on code/config changes             ${HDR}ROOK ITERATION TARGETS${NON}  (from any branch)
 ##    6.  Uninstall Rook before starting a new flow  ${CMD}make rook.uninstall${NON}     (from any branch)
 
 # Targets followed by '%' are hidden from make's tab complete. These targets can be called via
