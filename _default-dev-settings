@@ -38,6 +38,7 @@ export KUBECONFIG="${PWD}/kubeconfig"
 
 export KUBERNETES_DASHBOARD_YAML="https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta3/aio/deploy/recommended.yaml"
 export KUBERNETES_DASHBOARD_NAMESPACE="kubernetes-dashboard"
+export KUBERNETES_DASHBOARD_LOCAL_PORT=20443
 
 #------------------#
 # Libvirt settings #

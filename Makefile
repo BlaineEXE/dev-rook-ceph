@@ -63,7 +63,7 @@ k8s.install: $(OCTOPUS_TOOL)
 k8s.dash-install:
 	@ $(BASH) scripts/kubernetes/install-dashboard.sh
 
-##   k8s.fwd-dash       Port forward the kubernetes-dashboard service to localhost:443.
+##   k8s.fwd-dash       Port forward the kubernetes-dashboard service to localhost:20443.
 k8s.fwd-dash:
 	@ $(BASH) scripts/kubernetes/dashboard-port-forward.sh
 
