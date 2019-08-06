@@ -50,7 +50,7 @@ cluster.setup: $(OCTOPUS_TOOL)
 
 ##
 ## KUBERNETES TARGETS
-##   kubernetes.install Install Kubernetes on the cluster with params defined in ${FIL}developer-settings${NON}
+##   k8s.install        Install Kubernetes on the cluster with params defined in ${FIL}developer-settings${NON}
 kubernetes.install: $(OCTOPUS_TOOL)
 	@ $(BASH) scripts/kubernetes/install-kubeadm.sh
 	@ $(BASH) scripts/kubernetes/install-k8s.sh
@@ -59,11 +59,11 @@ kubernetes.install: $(OCTOPUS_TOOL)
 	@ $(BASH) scripts/kubernetes/untaint-master.sh
 	@ $(BASH) scripts/kubernetes/verify.sh
 
-##   kubernetes-dashboard.install Install kubernetes-dashboard on the cluster with params defined in ${FIL}developer-settings${NON}
+##   k8s.dash-install   Install kubernetes-dashboard with params defined in ${FIL}developer-settings${NON}
 kubernetes-dashboard.install:
 	@ $(BASH) scripts/kubernetes/install-dashboard.sh
 
-##   kubernetes-dashboard.fwd    Port forward the kubernetes-dashboard service to localhost.
+##   k8s.fwd-dash       Port forward the kubernetes-dashboard service to localhost:443.
 kubernetes-dashboard.fwd:
 	@ $(BASH) scripts/kubernetes/dashboard-port-forward.sh
 

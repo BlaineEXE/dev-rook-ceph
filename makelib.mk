@@ -56,7 +56,7 @@ IMG=$(ITL)
 	@ bash -c "echo -e \"$$( \
 	    sed -n -e 's/^##//p' $* | \
 	    sed -e 's/^ \([A-Z /]\+\)$$/ $${HDR}\1$${NON}/' | \
-			sed -e 's/^   \([A-Za-z.-]\+\)\(.*\)/   $${TGT}\1$${NON}\2/' | \
+			sed -e 's/^   \([A-Za-z0-9.-]\+\)\(.*\)/   $${TGT}\1$${NON}\2/' | \
 			sed -e 's/\"/\\\"/g' \
 	  )\""
 	@ echo ''
