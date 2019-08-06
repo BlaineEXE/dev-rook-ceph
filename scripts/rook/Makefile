@@ -134,7 +134,7 @@ rook.uninstall: rook.config-branch-file.%
 	@ $(MAKE) rook.showinfo
 	@ $(BASH) scripts/resources/success-message.sh "ROOK UN-INSTALLED"
 
-##   rook.show-info     Print info about the current Rook install/config.
+##   rook.showinfo     Print info about the current Rook install/config.
 rook.showinfo:
 	@ echo ''
 	@ $(MAKE) rook.print-config-branch.%
@@ -186,7 +186,7 @@ rook.dashboard-fwd:
 rook.restart-operator:
 	@ $(BASH) scripts/rook/restart-operator.sh
 
-##   rook.watch-pods       Watch Rook pods with `watch`
+##   rook.watch-pods       Watch Rook pods with ${CMD}watch${NON}
 rook.watch-pods:
 	@ watch --no-title kubectl --namespace $(ROOK_NAMESPACE) get pods
 

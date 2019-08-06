@@ -6,7 +6,7 @@ import os
 #
 
 # this can be set to allow multiple clusters on one URI without collisions
-CLUSTER_PREFIX = os.getenv("CLUSTER_PREFIX", "")
+CLUSTER_PREFIX = os.getenv("CLUSTER_PREFIX", os.getlogin() + '-')
 
 LIBVIRT_URI                 = os.getenv("LIBVIRT_URI", "qemu:///system")
 LIBVIRT_IMAGE_DOWNLOAD_POOL = os.getenv("LIBVIRT_IMAGE_DOWNLOAD_POOL", "default")
