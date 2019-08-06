@@ -7,7 +7,11 @@ MAKEFLAGS += --no-print-directory
 # This roundabout way of importing variables from 'developer-settings' works around the issue that
 # gnumake will read in quotes from variables if `developer-settings` is included directly.
 # e.g., var="val" will be read is as ["val"] instead of just [val]
-$(shell env --ignore-environment - bash -c "source developer-settings && env" > /tmp/mkenv)
+# Preserve PATH and USER env vars
+$(shell env --ignore-environment - PATH=$(PATH) USER=$(USER) bash -c "source developer-settings && env" > /tmp/mkenv)
+ifneq ($(.SHELLSTATUS),0)
+$(error Failed to source developer-settings file)
+endif
 include /tmp/mkenv
 export
 
