@@ -19,7 +19,7 @@ $(shell git update-index --assume-unchanged developer-settings)
 ##   quickstart         Perform all steps to set up a Kubernetes cluster ready for Rook development
 ##                          with params defined in ${FIL}developer-settings${NON}
 quickstart:
-	@ $(MAKE) cluster.build cluster.setup kubernetes.install
+	@ $(MAKE) cluster.build cluster.setup k8s.install
 
 ##
 ## CLUSTER TARGETS
