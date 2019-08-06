@@ -59,6 +59,14 @@ kubernetes.install: $(OCTOPUS_TOOL)
 	@ $(BASH) scripts/kubernetes/untaint-master.sh
 	@ $(BASH) scripts/kubernetes/verify.sh
 
+##   kubernetes-dashboard.install Install kubernetes-dashboard on the cluster with params defined in ${FIL}developer-settings${NON}
+kubernetes-dashboard.install:
+	@ $(BASH) scripts/kubernetes/install-dashboard.sh
+
+##   kubernetes-dashboard.fwd    Port forward the kubernetes-dashboard service to localhost.
+kubernetes-dashboard.fwd:
+	@ $(BASH) scripts/kubernetes/dashboard-port-forward.sh
+
 
 ##
 ## ROOK TARGETS
