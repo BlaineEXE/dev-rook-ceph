@@ -66,7 +66,7 @@ def generateNetworkData():
 def generateUserdata(hostname, sshPrivateKeyfile, sshPublicKeyfile):
     # start w/ template
     template = open("scripts/libvirt/cloud-init-template.cls", "r")
-    userdata = yaml.load(template)
+    userdata = yaml.safe_load(template)
     template.close()
 
     userdata["hostname"] = hostname
