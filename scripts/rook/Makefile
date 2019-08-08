@@ -78,9 +78,12 @@ rook.test: rook.make.test
 TEST ?= .*
 rook.integration:
 	@ rm -f _output/tests/*.log
-	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.run $(TEST)
-	@ echo "Test outputs are in _output/tests"
-	@ $(BASH) scripts/rook/wipe-disks.sh
+	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.run $(TEST) ;
+	  rc=$$? ; \
+	  echo "Test outputs are in _output/tests" ; \
+	  $(BASH) scripts/rook/wipe-disks.sh ; \
+	  exit $$rc
+#	^ If integration tests fail, still want to wipe disks, so save retcode, and exit with that later
 rook.integration?:
 	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.list '.*'
 
