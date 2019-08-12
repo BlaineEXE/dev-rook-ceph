@@ -32,7 +32,9 @@ DEFAULT_PSP="${root_dir}/scripts/rook/default-psp.yaml"
   sleep 10 # I think it takes a while for the CRDs to create. Workaround by sleeping a few seconds.
   kubectl apply -f cluster.yaml -f toolbox.yaml
   sleep 3
-  kubectl apply -f storageclass.yaml # allows block storage
+  kubectl apply -f csi/rbd/storageclass.yaml # allows block storage (RBD)
+  # TODO: add cephfs? 
+  #kubectl apply -f csi/cephfs/storageclass.yaml # allows filesystem storage (cephfs)
 )
 
 # Wait for all osd prepare pods to be completed
