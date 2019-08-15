@@ -3,13 +3,13 @@
 
 source scripts/shared.sh
 
-# BY DEFAULT, DO NOT FAIL ON BASH ERRORS
+# BY DEFAULT, DO NOT FAIL ON BASH_CMD ERRORS
 trap '' ERR
 
 echo ''
 echo 'DELETING ROOK RESOURCES'
 ( cd "${ROOK_CONFIG_DIR}"/ceph
-  for f in *.yaml; do
+  for f in $(find . -name '*.yaml'); do
     kubectl delete -f "${f}" --wait=false
   done
 )
@@ -22,7 +22,7 @@ ${OCTOPUS} --host-groups all run \
    dir=/var/lib/rook ; rm -rf "$dir"/* ; echo "$dir contents:" ; cd "$dir" 2>/dev/null && ls
    exit 0'
 
-${BASH} scripts/rook/wipe-disks.sh
+${BASH_CMD} scripts/rook/wipe-disks.sh
 
 # Wait for rook pods to be done running
 # rook-ceph can take a long time to terminate

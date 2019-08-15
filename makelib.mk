@@ -17,14 +17,14 @@ export
 
 
 export SUDO ?= sudo --preserve-env
-export BASH ?= bash
+export BASH_CMD ?= bash
 export PYTHON ?= python3
 export GO ?= $(GO_TOOL)
 export OCTOPUS ?= $(OCTOPUS_TOOL)
 
 
 ifdef DEBUG
-export BASH += -x
+export BASH_CMD += -x
 export OCTOPUS += -v
 endif
 

@@ -55,4 +55,4 @@ echo "done."
 
 echo -n "Rebooting nodes ..."
 ${OCTOPUS} --host-groups all run reboot &>/dev/null || true # will fail b/c conn will be lost
-${BASH} scripts/cluster/wait-for-up.sh
+${BASH_CMD} scripts/cluster/wait-for-up.sh

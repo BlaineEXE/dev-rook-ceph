@@ -18,7 +18,7 @@ if ! ${OCTOPUS} -g all run 'hostname' 1>/dev/null; then
 fi
 
 # Verify SSH connection to the cluster (via first master)
-if ! ${BASH} ssh-to-cluster.sh hostname &>/dev/null ; then
+if ! ${BASH_CMD} ssh-to-cluster.sh hostname &>/dev/null ; then
   echo "  ERROR: cannot SSH to the cluster"
   exit 1
 fi

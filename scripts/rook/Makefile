@@ -29,13 +29,13 @@ override CURRENT_BUILT_BRANCH_FILE := scripts/rook/_current-built-branch
 
 # make a symlink from the rook repo in the user's go path to here for easy access
 rook.symlink.%:
-	@ $(BASH) -c 'if [ ! -d $(ROOK_REPO_DIR) ]; then \
+	@ $(BASH_CMD) -c 'if [ ! -d $(ROOK_REPO_DIR) ]; then \
 	    echo "  ERROR! Rook has not been cloned to the GOPATH; cannot continue!"; exit 1; fi'
-	@ $(BASH) -c 'if [ ! -L rook ]; then ln -s $(ROOK_REPO_DIR) rook; fi'
+	@ $(BASH_CMD) -c 'if [ ! -L rook ]; then ln -s $(ROOK_REPO_DIR) rook; fi'
 
 rook.make.%: $(GO_TOOL) rook.symlink.%
-	@ if [ ! -d rook/vendor/ ]; then $(BASH) scripts/rook/make-ceph.sh vendor; fi
-	@ $(BASH) scripts/rook/make-ceph.sh $*
+	@ if [ ! -d rook/vendor/ ]; then $(BASH_CMD) scripts/rook/make-ceph.sh vendor; fi
+	@ $(BASH_CMD) scripts/rook/make-ceph.sh $*
 
 ##
 ## ROOK BUILD/TEST TARGETS
@@ -60,7 +60,7 @@ $(CURRENT_BUILT_BRANCH_FILE):
 rook.print-built-branch.%:
 	@ echo "  CURRENT BUILT BRANCH: $$(cat $(CURRENT_BUILT_BRANCH_FILE) 2> /dev/null)"
 rook.build.setinfo.%:
-	@ $(BASH) scripts/rook/push.sh
+	@ $(BASH_CMD) scripts/rook/push.sh
 	@ git -C rook/ rev-parse --abbrev-ref HEAD > $(CURRENT_BUILT_BRANCH_FILE) # store branch
 rook.build.showinfo.%:
 	@ bash scripts/resources/success-message.sh "ROOK BUILT"
@@ -81,7 +81,7 @@ rook.integration:
 	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.run $(TEST) ;
 	  rc=$$? ; \
 	  echo "Test outputs are in _output/tests" ; \
-	  $(BASH) scripts/rook/wipe-disks.sh ; \
+	  $(BASH_CMD) scripts/rook/wipe-disks.sh ; \
 	  exit $$rc
 #	^ If integration tests fail, still want to wipe disks, so save retcode, and exit with that later
 rook.integration?:
@@ -124,18 +124,18 @@ rook.unset-config:
 ##                          OR uses the active branch's config if a config branch is unset or not set.
 rook.install: rook.config-branch-file.%
 # Always install with default PSPs enabled (could be changed by rook.integration)
-	@ $(BASH) scripts/rook/install.sh
-	@ $(BASH) scripts/rook/install-filesystem.sh
-	@ $(BASH) scripts/resources/success-message.sh "ROOK INSTALLED"
+	@ $(BASH_CMD) scripts/rook/install.sh
+	@ $(BASH_CMD) scripts/rook/install-filesystem.sh
+	@ $(BASH_CMD) scripts/resources/success-message.sh "ROOK INSTALLED"
 	@ $(MAKE) rook.showinfo
 
 ##   rook.uninstall     Uninstall Rook from the cluster using the most recently set (or installed)
 ##                          config files. Run this target before copying new configs.
 rook.uninstall: rook.config-branch-file.%
-	@ $(BASH) scripts/rook/uninstall.sh
+	@ $(BASH_CMD) scripts/rook/uninstall.sh
 	@ sleep 10  # I think k8s needs time to flush the info from etcd
 	@ $(MAKE) rook.showinfo
-	@ $(BASH) scripts/resources/success-message.sh "ROOK UN-INSTALLED"
+	@ $(BASH_CMD) scripts/resources/success-message.sh "ROOK UN-INSTALLED"
 
 ##   rook.showinfo     Print info about the current Rook install/config.
 rook.showinfo:
@@ -153,7 +153,7 @@ rook.reinstall: rook.uninstall rook.install
 ##                          pushed, the operator pod is restarted to run the new version. Useful for
 ##                          quickly iterating on Rook code changes.
 rook.replace: rook.build
-	@ $(BASH) scripts/rook/restart-operator.sh
+	@ $(BASH_CMD) scripts/rook/restart-operator.sh
 	@ $(MAKE) rook.showinfo
 	@ bash scripts/resources/success-message.sh "ROOK IS REBUILT IN-PLACE"
 
@@ -175,19 +175,19 @@ rook.reconfig: rook.uninstall rook.set-config rook.install rook.showinfo
 ## ROOK DEV/DEBUG TARGETS
 ##   rook.toolbox-connect  Connect to the Rook toolbox.
 rook.toolbox-connect:
-	@ $(BASH) scripts/rook/toolbox-connect.sh
+	@ $(BASH_CMD) scripts/rook/toolbox-connect.sh
 
 ##   rook.operator-logs    Print and continue following the Rook operator log.
 rook.operator-logs:
-	@ $(BASH) scripts/rook/follow-operator-log.sh
+	@ $(BASH_CMD) scripts/rook/follow-operator-log.sh
 
 ##   rook.dashboard-fwd    Port forward the Ceph dashboard service to localhost.
 rook.dashboard-fwd:
-	@ $(BASH) scripts/rook/dashboard-port-forward.sh
+	@ $(BASH_CMD) scripts/rook/dashboard-port-forward.sh
 
 ##   rook.restart-operator Restart the rook operator by deleting the pod.
 rook.restart-operator:
-	@ $(BASH) scripts/rook/restart-operator.sh
+	@ $(BASH_CMD) scripts/rook/restart-operator.sh
 
 ##   rook.watch-pods       Watch Rook pods with ${CMD}watch${NON}
 rook.watch-pods:

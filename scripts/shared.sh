@@ -26,7 +26,7 @@ export -f get_toolbox_pod  # allow this to be used within suppress_output_unless
 
 function exec_in_toolbox_pod () {
   kubectl --namespace "${ROOK_NAMESPACE}" exec "$(get_toolbox_pod)" -- \
-    bash ${BASHFLAGS:=} -c "$*"
+    ${BASH_CMD} -c "$*"
 }
 export -f exec_in_toolbox_pod  # allow this to be used within suppress_output_unless_error
 
@@ -51,7 +51,7 @@ function wait_for () {
   echo -en "${msg} countdown: ${timeout}\r"
   output=""
   start_time=$SECONDS
-  until output="$(${BASH} -c "${cmd}")" ; do
+  until output="$(${BASH_CMD} -c "${cmd}")" ; do
     if (( SECONDS - start_time > timeout )); then
       echo -e "\r${msg} countdown: 0 ... timed out! (output below)"
       echo "${output}"

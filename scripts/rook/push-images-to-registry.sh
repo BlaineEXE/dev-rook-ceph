@@ -8,4 +8,4 @@ for image in $rook_images; do
   image_tag_pairs+=("${image}" "${image#rook-build/}:latest")
 done
 
-bash ${BASHFLAGS:=} scripts/dev-env/registry-push-images.sh "${image_tag_pairs[@]}"
+${BASH_CMD} scripts/dev-env/registry-push-images.sh "${image_tag_pairs[@]}"

@@ -60,24 +60,24 @@ upgrade.unset-to:
 upgrade.install:  $(UPGRADE_FROM_CONFIG_DIR)
 # increase install timeout to account for possible pulling of upstream images
 	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_FROM_CONFIG_DIR) INSTALL_TIMEOUT=450 rook.install
-	@ $(BASH) scripts/upgrade/install-supplemental.sh
+	@ $(BASH_CMD) scripts/upgrade/install-supplemental.sh
 
 ##   upgrade.uninstall  Uninstall the post- and pre-upgrade cluster resources.
 upgrade.uninstall: $(UPGRADE_FROM_CONFIG_DIR)
-	@ $(BASH) scripts/upgrade/uninstall-supplemental.sh
+	@ $(BASH_CMD) scripts/upgrade/uninstall-supplemental.sh
 	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_FROM_CONFIG_DIR) rook.uninstall
 
 ##   upgrade.rook       Upgrade Rook configs to those set via ${TGT}upgrade.set-to${NON} OR to the active
 ##                      branch's config if the 'to' config is not set.
 upgrade.rook: $(UPGRADE_TO_CONFIG_DIR)
-	@ $(BASH) scripts/upgrade/rook.sh
+	@ $(BASH_CMD) scripts/upgrade/rook.sh
 	@ bash scripts/resources/success-message.sh "UPGRADE IS COMMENCING. USER IS RESPONSIBLE FOR WATCHING UPGRADE."
 
 NEW_CEPH_IMAGE ?= ceph/ceph:v14.2
 ##   upgrade.ceph       Upgrade the Ceph image to that defined by the env var ${ENV}NEW_CEPH_IMAGE${NON}.
 ##                          (default ${VAL}${NEW_CEPH_IMAGE}${NON})
 upgrade.ceph:
-	@ $(BASH) scripts/upgrade/ceph.sh
+	@ $(BASH_CMD) scripts/upgrade/ceph.sh
 	@ bash scripts/resources/success-message.sh "UPGRADE IS COMMENCING. USER IS RESPONSIBLE FOR WATCHING UPGRADE."
 
 ##   upgrade.showinfo   Print ${TGT}rook.showinfo${NON} info supplemented with "from" and "to" config branches.

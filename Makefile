@@ -37,35 +37,35 @@ cluster.destroy:
 
 ##   cluster.setup      Set up the cluster's basic user tooling
 cluster.setup: $(OCTOPUS_TOOL)
-	@ $(BASH) -c "chmod 600 scripts/resources/.ssh/id_rsa"
-	@ $(BASH) scripts/cluster/config-octopus.sh
-	@ $(BASH) scripts/cluster/wait-for-up.sh
-	@ $(BASH) scripts/cluster/copy-octopus-to-cluster.sh
-	@ $(BASH) scripts/cluster/install-dependencies.sh
-	@ $(BASH) scripts/cluster/set-iptables-permissive.sh
-	@ $(BASH) scripts/cluster/exercise-ssh.sh
-	@ $(BASH) scripts/cluster/setup-bashrc.sh
-	@ $(BASH) scripts/cluster/verify.sh
+	@ $(BASH_CMD) -c "chmod 600 scripts/resources/.ssh/id_rsa"
+	@ $(BASH_CMD) scripts/cluster/config-octopus.sh
+	@ $(BASH_CMD) scripts/cluster/wait-for-up.sh
+	@ $(BASH_CMD) scripts/cluster/copy-octopus-to-cluster.sh
+	@ $(BASH_CMD) scripts/cluster/install-dependencies.sh
+	@ $(BASH_CMD) scripts/cluster/set-iptables-permissive.sh
+	@ $(BASH_CMD) scripts/cluster/exercise-ssh.sh
+	@ $(BASH_CMD) scripts/cluster/setup-bashrc.sh
+	@ $(BASH_CMD) scripts/cluster/verify.sh
 
 
 ##
 ## KUBERNETES TARGETS
 ##   k8s.install        Install Kubernetes on the cluster with params defined in ${FIL}developer-settings${NON}
 k8s.install: $(OCTOPUS_TOOL)
-	@ $(BASH) scripts/kubernetes/install-kubeadm.sh
-	@ $(BASH) scripts/kubernetes/install-k8s.sh
-	@ $(BASH) scripts/kubernetes/download-kubeconfig.sh
-	@ $(BASH) scripts/kubernetes/wait-for-up.sh
-	@ $(BASH) scripts/kubernetes/untaint-master.sh
-	@ $(BASH) scripts/kubernetes/verify.sh
+	@ $(BASH_CMD) scripts/kubernetes/install-kubeadm.sh
+	@ $(BASH_CMD) scripts/kubernetes/install-k8s.sh
+	@ $(BASH_CMD) scripts/kubernetes/download-kubeconfig.sh
+	@ $(BASH_CMD) scripts/kubernetes/wait-for-up.sh
+	@ $(BASH_CMD) scripts/kubernetes/untaint-master.sh
+	@ $(BASH_CMD) scripts/kubernetes/verify.sh
 
 ##   k8s.dash-install   Install kubernetes-dashboard with params defined in ${FIL}developer-settings${NON}
 k8s.dash-install:
-	@ $(BASH) scripts/kubernetes/install-dashboard.sh
+	@ $(BASH_CMD) scripts/kubernetes/install-dashboard.sh
 
 ##   k8s.fwd-dash       Port forward the kubernetes-dashboard service to localhost:20443.
 k8s.fwd-dash:
-	@ $(BASH) scripts/kubernetes/dashboard-port-forward.sh
+	@ $(BASH_CMD) scripts/kubernetes/dashboard-port-forward.sh
 
 
 ##
@@ -88,7 +88,7 @@ include scripts/upgrade/Makefile
 
 # call.script.% SCRIPT=<script-path> - to call a single script with make's env vars set up
 call.script.%:
-	@ $(BASH) $(SCRIPT)
+	@ $(BASH_CMD) $(SCRIPT)
 
 #
 # Help
