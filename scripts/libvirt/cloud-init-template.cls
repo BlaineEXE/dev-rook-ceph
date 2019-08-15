@@ -36,5 +36,6 @@ users:
 runcmd:
   - cp /etc/ssh/ssh_host_rsa_key /root/.ssh/id_rsa
   - cp /etc/ssh/ssh_host_rsa_key.pub /root/ssh/id_rsa.pub
+  - systemctl enable --now systemd-timesyncd
 
 final_message: "system up after $UPTIME seconds"
