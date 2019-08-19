@@ -26,7 +26,7 @@ echo 'SMOKE TESTING CEPHFS'
 
 
 # Mount the FS in the tools container, create a file, then unmount and exit
-kubectl exec -n "${ROOK_NAMESPACE}" "${toolbox_pod}" -- ${BASHCMD} -c "$(cat <<'EOF'
+kubectl exec -n "${ROOK_NAMESPACE}" "${toolbox_pod}" -- ${BASH_CMD} -c "$(cat <<'EOF'
 # Create dir for our
 mkdir /tmp/cephfs
 
