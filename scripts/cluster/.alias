@@ -9,3 +9,5 @@ alias ks="kubectl --namespace kube-system"
 
 alias kr="kubectl --namespace rook-ceph"
 alias krs="kubectl --namespace rook-ceph-system"
+
+alias krlogs="kubectl --namespace rook-ceph logs --all-containers"
