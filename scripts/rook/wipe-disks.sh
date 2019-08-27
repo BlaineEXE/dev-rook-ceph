@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Do not die in the face of errors: set -Eeuo pipefail
+set -Eeuo pipefail
 
 source scripts/shared.sh
 

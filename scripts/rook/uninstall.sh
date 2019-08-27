@@ -22,19 +22,28 @@ ${OCTOPUS} --host-groups all run \
    dir=/var/lib/rook ; rm -rf "$dir"/* ; echo "$dir contents:" ; cd "$dir" 2>/dev/null && ls
    exit 0'
 
+set -Ee
 ${BASH_CMD} scripts/rook/wipe-disks.sh
+set +Ee
 
 # Wait for rook pods to be done running
 # rook-ceph can take a long time to terminate
 wait_for "Rook resources to be deleted" 210 \
-  "! kubectl --namespace "${ROOK_NAMESPACE}" get pod --no-headers | grep -q rook"
+  "! kubectl --namespace ${ROOK_NAMESPACE} get pod --no-headers | grep -q rook"
 
 # Sometimes the ceph cluster CRD gets stuck in a state where it can't be deleted
 kubectl patch crd/cephclusters.ceph.rook.io -p '{"metadata":{"finalizers":[]}}' --type=merge
 sleep 3
 kubectl delete crd/cephcluster.ceph.rook.io --wait=false
 
-# Wait for Rook's namespaces to be deleted before returning success
-
-wait_for "Rook namespaces to be deleted" 90 \
+wait_for "Rook namespaces to be deleted" 210 \
   "! kubectl get namespaces | grep -q -e '${ROOK_SYSTEM_NAMESPACE}' -e '${ROOK_NAMESPACE}'"
+if [[ $? -eq 0 ]]; then exit 0; fi
+
+# # Sometimes we need to do this twice even :(
+# kubectl patch crd/cephclusters.ceph.rook.io -p '{"metadata":{"finalizers":[]}}' --type=merge
+# sleep 3
+# kubectl delete crd/cephcluster.ceph.rook.io --wait=false
+
+# wait_for "Rook namespaces to be deleted" 90 \
+#   "! kubectl get namespaces | grep -q -e '${ROOK_SYSTEM_NAMESPACE}' -e '${ROOK_NAMESPACE}'"

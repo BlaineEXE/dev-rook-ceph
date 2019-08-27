@@ -55,7 +55,7 @@ function wait_for () {
     if (( SECONDS - start_time > timeout )); then
       echo -e "\r${msg} countdown: 0 ... timed out! (output below)"
       echo "${output}"
-      exit 1
+      return 1
     fi
     echo -en "\r${msg} countdown: $((timeout - SECONDS + start_time)) "
     sleep 5
