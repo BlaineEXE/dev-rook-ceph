@@ -86,6 +86,10 @@ include scripts/rook/Makefile
 include scripts/upgrade/Makefile
 
 
+##
+## ADVANCED
+##  Set ${ENV}DEBUG=1${NON} when using ${CMD}make${NON} to run dev env scripts with additional debug output.
+
 # call.script.% SCRIPT=<script-path> - to call a single script with make's env vars set up
 call.script.%:
 	@ $(BASH_CMD) $(SCRIPT)
