@@ -20,7 +20,8 @@ rook_disks="$(find /dev -regex '/dev/[vs]d[a-z]+$' -and -not -wholename "${boot_
 # (zap-all is important, b/c MBR has to be clean)
 for disk in ${rook_disks}; do
   sgdisk --zap-all "${disk}"
-  dd if=/dev/zero of="${disk}" bs=512 count=255
+  # lvm metadata can be a lot of sectors
+  dd if=/dev/zero of="${disk}" bs=512 count=2500
 done
 
 # some devices might still be mapped that lock the disks
