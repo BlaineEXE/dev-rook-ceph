@@ -1,0 +1,8 @@
+#!/bin/sh
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+alias k="kubectl --kubeconfig=$SCRIPTPATH/../kubeconfig"
+alias ks="k -n kube-system"
+alias kr="k -n rook-ceph"
+alias krs="k -n rook-ceph-system"
+alias krlogs="kr logs --all-containers"
+
