@@ -10,21 +10,11 @@ if [[ -s "${UPGRADE_TO_CONFIG_BRANCH_FILE}" ]]; then
 fi
 echo "Upgrading Rook from config in branch '${from_branch}' to config in ${to_branch} ... "
 
-# for delete_me in ${UPGRADE_TO_CONFIG_DIR}/ceph/upgrade-*-delete.yaml; do
-#   set -x
-#   kubectl delete -f "${delete_me}"
-#   set +x
-# done
+find ${UPGRADE_TO_CONFIG_DIR}/ceph/ -name 'upgrade-*-delete.yaml' -exec kubectl delete -f {} \;
+find ${UPGRADE_TO_CONFIG_DIR}/ceph/ -name 'upgrade-*-create.yaml' -exec kubectl create -f {} \;
+find ${UPGRADE_TO_CONFIG_DIR}/ceph/ -name 'upgrade-*-apply.yaml' -exec kubectl apply -f {} \;
 
-for create_me in ${UPGRADE_TO_CONFIG_DIR}/ceph/upgrade-*-create.yaml; do
-  set -x
-  kubectl apply -f "${create_me}"
-  set +x
-done
-
-set -x
 kubectl --namespace "${ROOK_SYSTEM_NAMESPACE}" set image deploy/rook-ceph-operator \
   rook-ceph-operator=rook/ceph:master
-set +x
 
 echo "  ... done. The upgrade is commencing."

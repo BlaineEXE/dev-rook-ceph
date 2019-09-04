@@ -5,6 +5,7 @@ UPGRADE_TO_CONFIG_DIR ?= $(PWD)/.upgrade-to-config
 UPGRADE_FROM_CONFIG_BRANCH_FILE := $(UPGRADE_FROM_CONFIG_DIR)/_current-config-branch
 UPGRADE_TO_CONFIG_BRANCH_FILE := $(UPGRADE_TO_CONFIG_DIR)/_current-config-branch
 
+##
 ## ABOUT
 ##  Test Rook upgrades. Upgrade tooling is currently very much a work-in-progress.
 ##  These will probably only work upgrading from Rook v0.9 to master.
@@ -18,10 +19,9 @@ UPGRADE_TO_CONFIG_BRANCH_FILE := $(UPGRADE_TO_CONFIG_DIR)/_current-config-branch
 ##    3.  Build and push Rook images to hosts   ${CMD}make rook.build${NON}    (from working branch)
 ##    4a. Kick off a Rook upgrade               ${CMD}make upgrade.rook${NON}                    (from any branch)
 ##    4b. Kick off a Ceph upgrade               ${CMD}make upgrade.ceph NEW_CEPH_IMAGE=<?>${NON} (from any branch)
-##    5.  Manually verify the upgrade           ${BLD}DEV TARGETS${NON}                          (from any branch)
+##    5.  Manually verify the upgrade           See ${HDR}DEV${NON} targets from ${CMD}make rook.help${NON}  (from any branch)
 ##    6.  To iterate, repeat steps 3 onward
 ##    7.  Uninstall before starting a new flow  ${CMD}make upgrade.uninstall${NON}               (from any branch)
-
 
 ##
 ## UPGRADE TARGETS
@@ -86,18 +86,6 @@ upgrade.showinfo:
 	@ echo "  UPGRADE FROM BRANCH: $$(cat $(UPGRADE_FROM_CONFIG_BRANCH_FILE) 2> /dev/null)"
 	@ echo "  UPGRADE TO BRANCH: $$(cat $(UPGRADE_TO_CONFIG_BRANCH_FILE) 2> /dev/null)"
 	@ echo ''
-
-##
-## DEV TARGETS
-##  Because v1.0 changes the default Rook system namespace, these targets exist as a convenience for
-##  using Rook dev targets in an upgrade context.
-##   upgrade.operator-logs    Print and continue following the Rook operator log.
-upgrade.operator-logs:
-	@ $(MAKE) rook.operator-logs
-
-##   upgrade.restart-operator Restart the rook operator by deleting the pod.
-upgrade.restart-operator:
-	@ $(MAKE) rook.restart-operator
 
 #
 # Help
