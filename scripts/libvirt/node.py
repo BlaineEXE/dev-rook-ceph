@@ -4,6 +4,9 @@ import string
 import sys
 import virsh
 
+EXTRA_VOLUME_FMT="qcow2"  # ;; qcow2  ;;     raw     ;;
+EXTRA_VOLUME_BUS="virtio" # ;; virtio ;; sata | scsi ;;
+
 class HardwareConfig:
     def __init__(self, cpus, ram_MB):
         self.cpus = cpus
@@ -37,7 +40,7 @@ class LvmDomain:  # a.k.a. - node
         self.osConfig = osConfig
         self.volumeConfig = volumeConfig
         self.volumes = [
-            LvmVolume(name+"-vol-"+str(i), volumeConfig.sizeGB, volumeConfig.pool, "raw")
+            LvmVolume(name+"-vol-"+str(i), volumeConfig.sizeGB, volumeConfig.pool, EXTRA_VOLUME_FMT)
             for i in range(volumeConfig.count)
         ]
         self.networks = networkConfigs
@@ -64,10 +67,10 @@ class LvmDomain:  # a.k.a. - node
         virsh.SetDomainCPUandRAM(uri, self.name, self.hardwareConfig.cpus, self.hardwareConfig.ram_MB)
         # attach volumes
         for i in range(len(self.volumes)):
-            n = virsh.DeviceNameHintFromID(i, busType="scsi")
+            n = virsh.DeviceNameHintFromID(i, busType=EXTRA_VOLUME_BUS)
             v = self.volumes[i]
             print("attaching volume: " + v.name)
-            virsh.AttachVolumeToDomain(uri, v.pool, v.name, self.name, n, busType="scsi")
+            virsh.AttachVolumeToDomain(uri, v.pool, v.name, self.name, n, diskFmt=EXTRA_VOLUME_FMT, busType=EXTRA_VOLUME_BUS)
         # attach to networks
         for n in self.networks:
             print("attaching to network: " + n.name)

@@ -136,7 +136,7 @@ def VolIsAttachedToDomain(uri, volPool, volName, domainName):
 
 # example deviceNameHint = "sdc" | "vdd" | "hda"  # is only a hint to device ordering
 # busType = "sata" | "scsi" (default) | "virtio" | "ide"
-def AttachVolumeToDomain(uri, volPool, volName, domainName, deviceNameHint, busType="scsi"):
+def AttachVolumeToDomain(uri, volPool, volName, domainName, deviceNameHint, diskFmt="qcow2", busType="scsi"):
     if VolIsAttachedToDomain(uri, volPool, volName, domainName):
       print("volume '" + volName + "' is already attached to domain '" + domainName + "'")
       return
@@ -145,8 +145,9 @@ def AttachVolumeToDomain(uri, volPool, volName, domainName, deviceNameHint, busT
     v = p.storageVolLookupByName(volName)
     x = """<disk type='file'>
   <source file='{file}'/>
+  <driver name='qemu' type='{fmt}'/>
   <target dev='{dev}' bus='{bus}'/>
-</disk>""".format(file=volPath(v), dev=deviceNameHint, bus=busType)
+</disk>""".format(file=volPath(v), dev=deviceNameHint, fmt=diskFmt, bus=busType)
     d = conn.lookupByName(domainName)
     d.attachDeviceFlags(x, flags=libvirt.VIR_DOMAIN_AFFECT_CONFIG)
     if d.isActive():
