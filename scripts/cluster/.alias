@@ -11,3 +11,8 @@ alias kr="kubectl --namespace rook-ceph"
 alias krs="kubectl --namespace rook-ceph-system"
 
 alias krlogs="kubectl --namespace rook-ceph logs --all-containers"
+
+function kr_deployment_status_and_versions () {
+  kubectl -n rook-ceph get deployments -o jsonpath='{range .items[*]}{.metadata.name}{"  \treq/upd/avl: "}{.spec.replicas}{"/"}{.status.updatedReplicas}{"/"}{.status.readyReplicas}{"  \trook-version="}{.metadata.labels.rook-version}{"  \tceph-version="}{.metadata.labels.ceph-version}{"\n"}{end}'
+}
+export -f kr_deployment_status_and_versions

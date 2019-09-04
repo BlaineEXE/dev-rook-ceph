@@ -1,8 +1,12 @@
 #!/bin/sh
-SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 alias k="kubectl --kubeconfig=$SCRIPTPATH/../kubeconfig"
 alias ks="k -n kube-system"
 alias kr="k -n rook-ceph"
 alias krs="k -n rook-ceph-system"
 alias krlogs="kr logs --all-containers"
 
+function kr_deployment_status_and_versions () {
+  kr get deployments -o jsonpath='{range .items[*]}{.metadata.name}{"  \treq/upd/avl: "}{.spec.replicas}{"/"}{.status.updatedReplicas}{"/"}{.status.readyReplicas}{"  \trook-version="}{.metadata.labels.rook-version}{"  \tceph-version="}{.metadata.labels.ceph-version}{"\n"}{end}'
+}
+export -f kr_deployment_status_and_versions
