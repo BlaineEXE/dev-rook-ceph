@@ -53,6 +53,10 @@ echo -n "Raising max open files ..."
 suppress_output_unless_error "${OCTOPUS} --host-groups all run 'sysctl -w fs.file-max=1200000'"
 echo "done."
 
+echo -n "Minimize swappiness ..."
+suppress_output_unless_error "${OCTOPUS} --host-groups all run 'sysctl -w vm.swappiness=0'"
+echo "done."
+
 echo -n "Rebooting nodes ..."
 ${OCTOPUS} --host-groups all run reboot &>/dev/null || true # will fail b/c conn will be lost
 ${BASH_CMD} scripts/cluster/wait-for-up.sh
