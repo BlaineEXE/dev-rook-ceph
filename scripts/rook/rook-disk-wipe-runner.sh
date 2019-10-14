@@ -19,9 +19,10 @@ rook_disks="$(find /dev -regex '/dev/[vs]d[a-z]+$' -and -not -wholename "${boot_
 # zap the disks to a fresh, usable state after LVM info is delted
 # (zap-all is important, b/c MBR has to be clean)
 for disk in ${rook_disks}; do
-  sgdisk --zap-all "${disk}"
+  wipefs --all "${disk}"
   # lvm metadata can be a lot of sectors
   dd if=/dev/zero of="${disk}" bs=512 count=2500
+  sgdisk --zap-all "${disk}"
 done
 
 # some devices might still be mapped that lock the disks
