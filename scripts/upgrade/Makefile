@@ -56,7 +56,7 @@ upgrade.unset-to:
 	@ rm -rf $(UPGRADE_TO_CONFIG_DIR)
 	@ $(MAKE) upgrade.showinfo
 
-##   upgrade.install    Install the pre-upgrade cluster using configs set via ${TGT}upgrade.to${NON}.
+##   upgrade.install    Install the pre-upgrade cluster using configs set via ${TGT}upgrade.from${NON}.
 upgrade.install:  $(UPGRADE_FROM_CONFIG_DIR)
 # increase install timeout to account for possible pulling of upstream images
 	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_FROM_CONFIG_DIR) INSTALL_TIMEOUT=450 rook.install
@@ -67,7 +67,7 @@ upgrade.uninstall: $(UPGRADE_FROM_CONFIG_DIR)
 	@ $(BASH_CMD) scripts/upgrade/uninstall-supplemental.sh
 	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_FROM_CONFIG_DIR) rook.uninstall
 
-##   upgrade.rook       Upgrade Rook configs to those set via ${TGT}upgrade.set-to${NON} OR to the active
+##   upgrade.rook       Upgrade Rook configs to those set via ${TGT}upgrade.to${NON} OR to the active
 ##                      branch's config if the 'to' config is not set.
 upgrade.rook: $(UPGRADE_TO_CONFIG_DIR)
 	@ $(BASH_CMD) scripts/upgrade/rook.sh
