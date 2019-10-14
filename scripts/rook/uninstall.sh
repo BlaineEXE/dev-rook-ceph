@@ -18,17 +18,21 @@ wait_for "Rook resources to be deleted" 210 \
 
 # NEXT go through all the yaml files and do deletes on them to catch any other stuff
 ( cd "${ROOK_CONFIG_DIR}"/ceph
+  del_args=""
   for f in $(find . -name '*.yaml'); do
-    kubectl delete -f "${f}" --wait=false
+    # kubectl delete -f "${f}" --wait=false
+    del_args="${del_args} -f ${f}"
   done
+  kubectl delete ${del_args} --wait=false
 )
 
 # Rook won't overwrite existing data, so delete the data on rook destroy
 echo ''
 echo 'DELETING ROOK DATA FROM NODES'
 ${OCTOPUS} --host-groups all run \
-  'dir=/home/ses     ; rm -rf "$dir"/* ; echo "$dir contents:" ; cd "$dir" 2>/dev/null && ls
-   dir=/var/lib/rook ; rm -rf "$dir"/* ; echo "$dir contents:" ; cd "$dir" 2>/dev/null && ls
+  'dir=/home/ses          ; rm -rf "$dir"/* ; echo "$dir contents:" ; cd "$dir" 2>/dev/null && ls
+   dir=/var/lib/rook      ;  rm -rf "$dir"/* ; echo "$dir contents:" ; cd "$dir" 2>/dev/null && ls
+   dir=/var/lib/rook-ceph ; rm -rf "$dir"/* ; echo "$dir contents:" ; cd "$dir" 2>/dev/null && ls
    exit 0'
 
 set -Ee
@@ -47,12 +51,12 @@ kubectl delete crd/cephclusters.ceph.rook.io --wait=false
 
 wait_for "Rook namespaces to be deleted" 210 \
   "! kubectl get namespaces | grep -q -e '${ROOK_SYSTEM_NAMESPACE}' -e '${ROOK_NAMESPACE}'"
-if [[ $? -eq 0 ]]; then exit 0; fi
+# if [[ $? -eq 0 ]]; then exit 0; fi
 
-# # Sometimes we need to do this twice even :(
-# kubectl patch crd/cephclusters.ceph.rook.io -p '{"metadata":{"finalizers":[]}}' --type=merge
-# sleep 3
-# kubectl delete crd/cephcluster.ceph.rook.io --wait=false
-
-# wait_for "Rook namespaces to be deleted" 90 \
-#   "! kubectl get namespaces | grep -q -e '${ROOK_SYSTEM_NAMESPACE}' -e '${ROOK_NAMESPACE}'"
+# If removing resources by files, sometimes resources get left in ETCD database, and usually it is a
+# Rook-Ceph cluster that keeps its 'deleting' status and is deleted by k8s immediately after a new
+# dev Rook-Ceph cluster is created. So find the Rook-/Ceph-related ETCD resources, and remove them.
+# get the ETCD container on the master node (cannot be a pause container)
+echo 'WIPE ETCD'
+${OCTOPUS} --host-groups first_master copy scripts/rook/rook-etcd-wipe-runner.sh /root
+${OCTOPUS} --host-groups first_master run "${BASH_CMD} /root/rook-etcd-wipe-runner.sh"
