@@ -72,7 +72,7 @@ rook.build.startmsg.%:
 rook.test: rook.make.test
 	@ bash scripts/resources/success-message.sh "ROOK UNIT TESTS PASSED"
 
-##   rook.integration   Run Rook integration tests. Specify a specific test by setting the TEST env
+##   rook.integration   Run Rook integration tests. Specify a specific test by setting the ${ENV}TEST${NON} env
 ##                          variable. Uses the pushed ${IMG}rook/rook:master${NON} image.
 ##                          See possible tests with ${CMD}make rook.integration?${NON}.
 TEST ?= .*
