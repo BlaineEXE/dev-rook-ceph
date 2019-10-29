@@ -15,7 +15,7 @@ export NUM_WORKERS=2
 
 # Configure how the cluster nodes are configured.
 # The node OS image is a URL which will be downloaded
-export NODE_OS_IMAGE="https://download.opensuse.org/distribution/leap/15.0/jeos/openSUSE-Leap-15.0-JeOS.x86_64-15.0.1-OpenStack-Cloud-Current.qcow2"
+export NODE_OS_IMAGE="https://download.opensuse.org/distribution/leap/15.1/jeos/openSUSE-Leap-15.1-JeOS.x86_64-15.1.0-OpenStack-Cloud-Current.qcow2"
 export NODE_ROOK_VOLUMES=2   # Add this many volumes to each cluster node
 export NODE_ROOK_VOLUME_SIZE_GB=10  # Size of added volumes in Gigabytes
 export NODE_VCPUS=2
