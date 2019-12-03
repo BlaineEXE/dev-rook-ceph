@@ -42,8 +42,10 @@ echo "  setting up cluster overlay network CNI ..."
 # suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
 # 'kubectl apply -f
 # https://raw.githubusercontent.com/cilium/cilium/v1.5/examples/kubernetes/1.14/cilium.yaml'"
+# suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
+#  'kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/bc79dd1505b0c8681ece4de4c0d86c5cd2643275/Documentation/kube-flannel.yml'"
 suppress_output_unless_error "${OCTOPUS} --host-groups first_master run \
-  'kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/bc79dd1505b0c8681ece4de4c0d86c5cd2643275/Documentation/kube-flannel.yml'"
+  'kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml'"
 
 # echo "  joining remaining master nodes to Kubernetes cluster ..."
 # join_command="??????"
