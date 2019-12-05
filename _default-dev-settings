@@ -15,7 +15,7 @@ export NUM_WORKERS=2
 
 # Configure how the cluster nodes are configured.
 # The node OS image is a URL which will be downloaded
-export NODE_OS_IMAGE="https://download.opensuse.org/distribution/leap/15.0/jeos/openSUSE-Leap-15.0-JeOS.x86_64-15.0.1-OpenStack-Cloud-Current.qcow2"
+export NODE_OS_IMAGE="https://download.opensuse.org/distribution/leap/15.1/jeos/openSUSE-Leap-15.1-JeOS.x86_64-15.1.0-OpenStack-Cloud-Current.qcow2"
 export NODE_ROOK_VOLUMES=2   # Add this many volumes to each cluster node
 export NODE_ROOK_VOLUME_SIZE_GB=10  # Size of added volumes in Gigabytes
 export NODE_VCPUS=2
@@ -29,7 +29,7 @@ export NET_CIDR="172.60.0.0/22"
 # Kubernetes settings #
 #---------------------#
 
-export K8S_VERSION=v1.15.2
+export K8S_VERSION=v1.16.3
 
 # This serves a dual purpose: (1) define a location to download the cluster kubeconfig, and
 # (2) define said kubeconfig file as the env var which kubectl uses to find the config file

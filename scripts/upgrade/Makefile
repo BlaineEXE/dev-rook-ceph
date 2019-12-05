@@ -59,7 +59,7 @@ upgrade.unset-to:
 ##   upgrade.install    Install the pre-upgrade cluster using configs set via ${TGT}upgrade.from${NON}.
 upgrade.install:  $(UPGRADE_FROM_CONFIG_DIR)
 # increase install timeout to account for possible pulling of upstream images
-	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_FROM_CONFIG_DIR) INSTALL_TIMEOUT=450 rook.install
+	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_FROM_CONFIG_DIR) INSTALL_TIMEOUT=900 rook.install
 	@ $(BASH_CMD) scripts/upgrade/install-supplemental.sh
 
 ##   upgrade.uninstall  Uninstall the post- and pre-upgrade cluster resources.

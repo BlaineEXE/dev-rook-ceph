@@ -3,7 +3,7 @@ set -euo pipefail
 
 source scripts/shared.sh
 
-INSTALL_TIMEOUT=${INSTALL_TIMEOUT:-450}
+INSTALL_TIMEOUT=${INSTALL_TIMEOUT:-900}
 
 root_dir="${PWD}"
 
