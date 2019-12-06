@@ -14,7 +14,7 @@ suppress_output_unless_error "${OCTOPUS} --host-groups all run \
 
 echo "  downloading and installing crictl ..."
 # kubeadm uses crictl to talk to docker/crio
-CRICTL_VERSION=v1.14.0
+CRICTL_VERSION=v1.16.0
 suppress_output_unless_error "${OCTOPUS} --host-groups all run '\
     rm -f crictl-${CRICTL_VERSION}-linux-amd64.tar.gz*
     wget https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz && \
