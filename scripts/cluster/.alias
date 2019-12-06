@@ -3,6 +3,8 @@ alias l='ls -alF'
 alias la='ls -la'
 alias ll='ls -l'
 
+alias cc='clear; clear'
+
 alias k="kubectl"
 
 alias ks="kubectl --namespace kube-system"
@@ -13,6 +15,6 @@ alias krs="kubectl --namespace rook-ceph-system"
 alias krlogs="kubectl --namespace rook-ceph logs --all-containers"
 
 function kr_deployment_status_and_versions () {
-  kubectl -n rook-ceph get deployments -o jsonpath='{range .items[*]}{.metadata.name}{"  \treq/upd/avl: "}{.spec.replicas}{"/"}{.status.updatedReplicas}{"/"}{.status.readyReplicas}{"  \trook-version="}{.metadata.labels.rook-version}{"  \tceph-version="}{.metadata.labels.ceph-version}{"\n"}{end}'
+  kubectl -n rook-ceph get deployments -o custom-columns=NAME:.metadata.name,REQ:.spec.replicas,AVL:.status.readyReplicas,CEPH-VERSION:.metadata.labels.ceph-version,ROOK-VERSION:.metadata.labels.rook-version
 }
 export -f kr_deployment_status_and_versions
