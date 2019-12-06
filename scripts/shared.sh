@@ -51,7 +51,7 @@ function wait_for () {
   echo -en "${msg} countdown: ${timeout}\r"
   output=""
   start_time=$SECONDS
-  until output="$(${BASH_CMD} -c "${cmd}")" ; do
+  until output="$(${BASH_CMD} -c "${cmd}" 2>&1)" ; do
     if (( SECONDS - start_time > timeout )); then
       echo -e "\r${msg} countdown: 0 ... timed out! (output below)"
       echo "${output}"
