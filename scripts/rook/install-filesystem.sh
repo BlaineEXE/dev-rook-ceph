@@ -5,18 +5,18 @@ source scripts/shared.sh
 echo ''
 echo 'SETTING UP CEPHFS AND INSTALLING MDSES'
 ( cd ${ROOK_CONFIG_DIR}/ceph
-  kubectl create -f filesystem.yaml
+  # kubectl create -f filesystem.yaml
 )
 
 # Wait for 2 mdses to start
 wait_for "mdses to start" 90 \
   "kubectl get --namespace ${ROOK_NAMESPACE} pods | grep -q 'rook-ceph-mds-myfs-b.*Running'"
 
-# Test the FS in a mon pod
-toolbox_pod="$(get_toolbox_pod)"
+# Test the FS
+# create_test_pod
 
 wait_for "myfs to be active" 60 \
-  "exec_in_toolbox_pod 'ceph fs status myfs 2>&1 | grep -q active' &> /dev/null"
+  "exec_in_test_pod 'ceph fs status myfs 2>&1 | grep active' &> /dev/null"
   # must use 'bash -c "...stuff..."' to use pipes within kubectl exec
   # for whatever reason, 'ceph fs status' returns info on stderr ... ?
   # above will print 'command terminated with exit code #' if stderr isn't sent to /dev/null
@@ -26,7 +26,7 @@ echo 'SMOKE TESTING CEPHFS'
 
 
 # Mount the FS in the tools container, create a file, then unmount and exit
-kubectl exec -n "${ROOK_NAMESPACE}" "${toolbox_pod}" -- ${BASH_CMD} -c "$(cat <<'EOF'
+exec_in_test_pod "$(cat <<'EOF'
 # Create dir for our
 mkdir /tmp/cephfs
 
@@ -48,7 +48,7 @@ EOF
 )"
 
 # Mount the FS in the tools container again, see that the file exits w/ the right info
-kubectl exec -n "${ROOK_NAMESPACE}" "${toolbox_pod}" -- ${BASH_CMD} -c "$(cat <<'EOF'
+exec_in_test_pod "$(cat <<'EOF'
 # Create dir for our
 mkdir /tmp/cephfs
 

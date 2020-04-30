@@ -26,6 +26,9 @@ wait_for "Rook resources to be deleted" 210 \
   kubectl delete ${del_args} --wait=false
 )
 
+# Delete the test pod if it exists
+delete_test_pod
+
 # Rook won't overwrite existing data, so delete the data on rook destroy
 echo ''
 echo 'DELETING ROOK DATA FROM NODES'
