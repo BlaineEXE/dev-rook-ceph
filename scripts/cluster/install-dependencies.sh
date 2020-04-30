@@ -15,6 +15,7 @@ suppress_output_unless_error "${OCTOPUS} --host-groups all run \
       docker \
       ebtables \
       ethtool \
+      jq \
       lvm2 \
       lsof \
       ntp \
