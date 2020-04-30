@@ -60,7 +60,8 @@ $(CURRENT_BUILT_BRANCH_FILE):
 rook.print-built-branch.%:
 	@ echo "  CURRENT BUILT BRANCH: $$(cat $(CURRENT_BUILT_BRANCH_FILE) 2> /dev/null)"
 rook.build.setinfo.%:
-	@ $(BASH_CMD) scripts/rook/push.sh
+	# Rook integration tests assume the image under test is "rook/ceph:master"
+	@ $(BASH_CMD) scripts/resources/push-image.sh "rook-build/ceph-$(GOARCH)" "rook/ceph:master"
 	@ git -C rook/ rev-parse --abbrev-ref HEAD > $(CURRENT_BUILT_BRANCH_FILE) # store branch
 rook.build.showinfo.%:
 	@ bash scripts/resources/success-message.sh "ROOK BUILT"
