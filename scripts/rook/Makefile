@@ -40,7 +40,7 @@ rook.make.%: $(GO_TOOL) rook.symlink.%
 ##
 ## ROOK BUILD/TEST TARGETS
 
-##   rook.build         Build Rook locally, and push the Rook image to nodes as ${IMG}rook/rook:master${NON}
+##   rook.build         Build Rook locally, and push the Rook image to nodes as ${IMG}rook/ceph:master${NON}
 ##   rook.build.nopush  Build Rook locally, but do not push the Rook image to nodes
 rook.build: rook.symlink.%
 	@ $(MAKE) rook.build.startmsg.%
