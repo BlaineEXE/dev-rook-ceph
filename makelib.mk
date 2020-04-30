@@ -21,11 +21,13 @@ export BASH_CMD ?= bash
 export PYTHON ?= python3
 export GO ?= $(GO_TOOL)
 export OCTOPUS ?= $(OCTOPUS_TOOL)
+export DOCKER ?= docker
 
 
 ifdef DEBUG
 export BASH_CMD += -x
 export OCTOPUS += -v
+export DOCKER += --debug
 endif
 
 # Text style definitions ...

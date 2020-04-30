@@ -78,7 +78,8 @@ include scripts/rook/Makefile
 
 ##
 ## CEPH TARGETS
-##   [not yet implemented]
+##   ceph.help          Show all Ceph targets
+include scripts/ceph/Makefile
 
 ##
 ## UPGRADE TARGETS
