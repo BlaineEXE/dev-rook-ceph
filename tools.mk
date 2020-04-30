@@ -25,7 +25,7 @@ $(shell env --ignore-environment - bash -c "set -a && source /tmp/user-goenv && 
 include /tmp/goenv
 export
 
-export GO_VERSION ?= 1.12.5
+export GO_VERSION ?= 1.14.2
 export USER_GOROOT := $(GOROOT)
 # change go root to the dev env path
 export GOROOT := $(TOOLS_DIR)/go-$(GO_VERSION)
