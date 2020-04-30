@@ -29,7 +29,7 @@ export NET_CIDR="172.60.0.0/22"
 # Kubernetes settings #
 #---------------------#
 
-export K8S_VERSION=v1.16.3
+export K8S_VERSION=v1.17.0
 
 # This serves a dual purpose: (1) define a location to download the cluster kubeconfig, and
 # (2) define said kubeconfig file as the env var which kubectl uses to find the config file
