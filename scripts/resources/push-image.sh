@@ -25,7 +25,7 @@ tarball_name="${tarball_name}.tar"  # add .tar suffix
 # Compressing the file with gzip can take 4 times as long, so it's not worth it
 tarfile="${local_image_dir}"/"${tarball_name}"
 echo "Saving image ${remote_image} to tar file ${tarfile} ..."
-docker save rook/ceph:master > "${tarfile}"
+docker save ${remote_image} > "${tarfile}"
 
 echo "Copying image tar file ${tarfile} to cluster nodes ..."
 # buffer size 256 fails sometimes w/ EOF. 128 seems safe. 64 isn't noticeably slower on ECP
