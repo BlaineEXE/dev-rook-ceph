@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
 source scripts/shared.sh
 
@@ -28,6 +28,9 @@ DEFAULT_PSP="${root_dir}/scripts/rook/default-psp.yaml"
     kubectl apply -f psp.yaml
   fi
   kubectl apply -f operator.yaml
+
+  # Set the Rook log level to Debug after creating the operator deployment for our development
+  kubectl --namespace ${ROOK_NAMESPACE} set env deployment/rook-ceph-operator ROOK_LOG_LEVEL=DEBUG
 
   sleep 10 # I think it takes a while for the CRDs to create. Workaround by sleeping a few seconds.
   kubectl apply -f cluster.yaml -f toolbox.yaml
