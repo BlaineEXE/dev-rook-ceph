@@ -11,8 +11,8 @@ source scripts/shared.sh
 echo "Tagging local image ${local_image} as ${remote_image} ..."
 docker tag "${local_image}" "${remote_image}"
 
-local_image_dir="${PWD}/.images/"
-node_image_dir="/root/.images/"
+local_image_dir=".images"
+node_image_dir="/root/.images"
 mkdir -p "${local_image_dir}"
 
 tarball_name="${remote_image}"      # name tarball based on remote image name
