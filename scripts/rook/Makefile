@@ -34,7 +34,6 @@ rook.symlink.%:
 	@ $(BASH_CMD) -c 'if [ ! -L rook ]; then ln -s $(ROOK_REPO_DIR) rook; fi'
 
 rook.make.%: $(GO_TOOL) rook.symlink.%
-	@ if [ ! -d rook/vendor/ ]; then $(BASH_CMD) scripts/rook/make-ceph.sh vendor; fi
 	@ $(BASH_CMD) scripts/rook/make-ceph.sh $*
 
 ##
