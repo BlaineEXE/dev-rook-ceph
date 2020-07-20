@@ -16,6 +16,7 @@ suppress_output_unless_error "${OCTOPUS} --host-groups all run \
       ebtables \
       ethtool \
       jq \
+      libseccomp-devel \
       lvm2 \
       lsof \
       ntp \
