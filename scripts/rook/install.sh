@@ -8,7 +8,7 @@ INSTALL_TIMEOUT=${INSTALL_TIMEOUT:-900}
 root_dir="${PWD}"
 
 echo ''
-echo 'INSTALLING CEPH'
+echo 'INSTALLING ROOK-CEPH'
 
 DEFAULT_PSP="${root_dir}/scripts/rook/default-psp.yaml"
 
