@@ -16,4 +16,7 @@
 
 /ceph
 
+/supportutils-plugin-rook
+/supportutils-plugin-ses
+
 __pycache__
