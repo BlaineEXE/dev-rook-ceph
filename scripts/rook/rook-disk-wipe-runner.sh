@@ -21,7 +21,7 @@ rook_disks="$(find /dev -regex '/dev/[vs]d[a-z]+$' -and -not -wholename "${boot_
 for disk in ${rook_disks}; do
   wipefs --all "${disk}"
   # lvm metadata can be a lot of sectors
-  dd if=/dev/zero of="${disk}" bs=512 count=2500
+  dd if=/dev/zero of="${disk}" bs=512 count=10000
   sgdisk --zap-all "${disk}"
 done
 
