@@ -20,7 +20,7 @@ NODE_OS_IMAGE            = os.getenv("NODE_OS_IMAGE",
     "https://download.opensuse.org/distribution/leap/15.1/jeos/openSUSE-Leap-15.1-JeOS.x86_64-15.1.0-OpenStack-Cloud-Current.qcow2")
 NODE_VCPUS               = int(os.getenv("NODE_VCPUS", "2"))
 NODE_RAM_MB              = int(os.getenv("NODE_RAM_MB", "2048"))
-NODE_MIN_OS_DISK_SIZE    = int(os.getenv("NODE_MIN_OS_DISK_SIZE", "30"))
+NODE_MIN_OS_DISK_SIZE    = int(os.getenv("NODE_MIN_OS_DISK_SIZE", "45"))
 NODE_ROOK_VOLUMES        = int(os.getenv("NODE_ROOK_VOLUMES", "2"))
 NODE_ROOK_VOLUME_SIZE_GB = int(os.getenv("NODE_ROOK_VOLUME_SIZE_GB", "10"))
 
