@@ -124,7 +124,7 @@ rook.unset-config:
 rook.install: rook.config-branch-file.%
 # Always install with default PSPs enabled (could be changed by rook.integration)
 	@ $(BASH_CMD) scripts/rook/install.sh
-	@ $(BASH_CMD) scripts/rook/install-filesystem.sh
+	@ # $(BASH_CMD) scripts/rook/install-filesystem.sh
 	@ $(BASH_CMD) scripts/resources/success-message.sh "ROOK INSTALLED"
 	@ $(MAKE) rook.showinfo
 
