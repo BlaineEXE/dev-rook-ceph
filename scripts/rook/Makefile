@@ -21,19 +21,18 @@
 # `make target.%`; however, this is an advanced usage not documented in the help text.
 # Run a Rook make target with only the Ceph backend
 
-ROOK_REPO_DIR ?= $(GOPATH)/src/github.com/rook/rook
+ROOK_REPO_DIR ?= $(PWD)/rook
 ROOK_CONFIG_DIR ?= $(PWD)/.rook-config
 override CURRENT_CONFIG_BRANCH_FILE := $(ROOK_CONFIG_DIR)/_current-config-branch
 override CURRENT_BUILT_BRANCH_FILE := scripts/rook/_current-built-branch
 
 
-# make a symlink from the rook repo in the user's go path to here for easy access
-rook.symlink.%:
-	@ $(BASH_CMD) -c 'if [ ! -d $(ROOK_REPO_DIR) ]; then \
-	    echo "  ERROR! Rook has not been cloned to the GOPATH; cannot continue!"; exit 1; fi'
-	@ $(BASH_CMD) -c 'if [ ! -L rook ]; then ln -s $(ROOK_REPO_DIR) rook; fi'
+# ensure the rook repo is cloned to this project
+rook.repo.%: $(GO_TOOL)
+	@ $(BASH_CMD) -c 'if ! git -C $(ROOK_REPO_DIR) status >/dev/null; then \
+	    echo "  ERROR! Rook repo is not cloned to ROOK_REPO_DIR=$(ROOK_REPO_DIR); cannot continue!"; exit 1; fi'
 
-rook.make.%: $(GO_TOOL) rook.symlink.%
+rook.make.%: $(GO_TOOL) rook.repo.%
 	@ $(BASH_CMD) scripts/rook/make-ceph.sh $*
 
 ##
@@ -41,12 +40,12 @@ rook.make.%: $(GO_TOOL) rook.symlink.%
 
 ##   rook.build         Build Rook locally, and push the Rook image to nodes as ${IMG}rook/ceph:master${NON}
 ##   rook.build.nopush  Build Rook locally, but do not push the Rook image to nodes
-rook.build: rook.symlink.%
+rook.build: rook.repo.%
 	@ $(MAKE) rook.build.startmsg.%
 	@ $(MAKE) rook.make.build
 	@ $(MAKE) rook.build.setinfo.%
 	@ $(MAKE) rook.build.showinfo.%
-rook.build.nopush: rook.symlink.%
+rook.build.nopush: rook.repo.%
 	@ $(MAKE) rook.build.startmsg.%
 	@ echo '    (NOT PUSHING BUILT IMAGES TO DEV CLUSTER)'
 	@ $(MAKE) rook.make.build
@@ -87,8 +86,8 @@ rook.integration:
 rook.integration?:
 	@ rook/_output/tests/${GOOS}_${GOARCH}/integration -test.list '.*'
 
-##   rook.unpush        Remove the pushed ${IMG}rook/rook:master${NON} image from nodes so that installs and
-##                          tests will use the upstream image.
+# ##   rook.unpush        Remove the pushed ${IMG}rook/rook:master${NON} image from nodes so that installs and
+# ##                          tests will use the upstream image.
 
 ##
 ## ROOK INSTALL TARGETS
@@ -96,7 +95,7 @@ rook.integration?:
 ##   rook.set-config    Set the config branch by copying the current Rook branch's manifest files to
 ##                          ${DIR}.rook-config/${NON}. This allows you to have a consistent Rook
 ##                          config regardless of branch changes.
-rook.copy-config.%: rook.symlink.% rook.unset-config
+rook.copy-config.%: rook.repo.% rook.unset-config
 # only copy the configs, don't store the branch
 	@ mkdir -p $(ROOK_CONFIG_DIR)
 	@ cp -a rook/cluster/examples/kubernetes/* $(ROOK_CONFIG_DIR)/.
@@ -109,7 +108,7 @@ $(CURRENT_CONFIG_BRANCH_FILE):
 	@ printf '  using configs from the current branch: %s\n' "$$(git -C rook/ rev-parse --abbrev-ref HEAD)"
 	@ $(MAKE) rook.copy-config.%
 # ^ don't store the current branch in this case to keep using active branch by default
-rook.config-branch-file.%: rook.symlink.% $(CURRENT_CONFIG_BRANCH_FILE) ;
+rook.config-branch-file.%: rook.repo.% $(CURRENT_CONFIG_BRANCH_FILE) ;
 # ^ use this to make a dependency on CURRENT_CONFIG_BRANCH_FILE so it gets symlink dependency too
 rook.print-config-branch.%:
 	@ echo "  CURRENT CONFIG BRANCH: $$(cat $(CURRENT_CONFIG_BRANCH_FILE) 2> /dev/null)"
