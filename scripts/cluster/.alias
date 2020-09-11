@@ -9,14 +9,14 @@ alias k="kubectl"
 
 alias ks="kubectl --namespace kube-system"
 
-alias kr="kubectl --namespace rook-ceph"
-alias krs="kubectl --namespace rook-ceph-system"
+alias kr='kubectl --namespace ${ROOK_NAMESPACE:=rook-ceph}'
+alias krs='kubectl --namespace ${ROOK_SYSTEM_NAMESPACE:=rook-ceph}'
 
-alias krlogs="kubectl --namespace rook-ceph logs --all-containers"
+alias krlogs='kubectl --namespace ${ROOK_NAMESPACE:=rook-ceph} logs --all-containers'
 
-alias krpodnodes="kubectl --namespace rook-ceph get pod -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName"
+alias krpodnodes='kubectl --namespace ${ROOK_NAMESPACE:=rook-ceph} get pod -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName'
 
 function kr_deployment_status_and_versions () {
-  kubectl -n rook-ceph get deployments -o custom-columns=NAME:.metadata.name,REQ:.spec.replicas,AVL:.status.readyReplicas,CEPH-VERSION:.metadata.labels.ceph-version,ROOK-VERSION:.metadata.labels.rook-version
+  kubectl -n ${ROOK_NAMESPACE:=rook-ceph} get deployments -o custom-columns=NAME:.metadata.name,REQ:.spec.replicas,AVL:.status.readyReplicas,CEPH-VERSION:.metadata.labels.ceph-version,ROOK-VERSION:.metadata.labels.rook-version
 }
 export -f kr_deployment_status_and_versions
