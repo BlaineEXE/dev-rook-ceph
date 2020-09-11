@@ -14,6 +14,8 @@ alias krs="kubectl --namespace rook-ceph-system"
 
 alias krlogs="kubectl --namespace rook-ceph logs --all-containers"
 
+alias krpodnodes="kubectl --namespace rook-ceph get pod -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName"
+
 function kr_deployment_status_and_versions () {
   kubectl -n rook-ceph get deployments -o custom-columns=NAME:.metadata.name,REQ:.spec.replicas,AVL:.status.readyReplicas,CEPH-VERSION:.metadata.labels.ceph-version,ROOK-VERSION:.metadata.labels.rook-version
 }
