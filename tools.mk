@@ -21,7 +21,7 @@ $(OCTOPUS_TOOL):
 
 # some environments don't transfer GO env vars to gnumake; load & export them here
 $(shell go env > /tmp/user-goenv)
-$(shell env --ignore-environment - bash -c "set -a && source /tmp/user-goenv && env" > /tmp/goenv)
+$(shell env -i - bash -c "set -a && source /tmp/user-goenv && env" > /tmp/goenv)
 include /tmp/goenv
 export
 

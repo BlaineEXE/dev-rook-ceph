@@ -4,11 +4,15 @@ export
 # Entering/Leaving directory messages are annoying and not very useful
 MAKEFLAGS += --no-print-directory
 
+ifneq (4.2,$(firstword $(sort $(MAKE_VERSION) 4.2)))
+$(error Requires make version 4.2+)
+endif
+
 # This roundabout way of importing variables from 'developer-settings' works around the issue that
 # gnumake will read in quotes from variables if `developer-settings` is included directly.
 # e.g., var="val" will be read is as ["val"] instead of just [val]
 # Preserve PATH and USER env vars
-$(shell env --ignore-environment - PATH=$(PATH) USER=$(USER) bash -c "source developer-settings && env" > /tmp/mkenv)
+$(shell env -i - PATH=$(PATH) USER=$(USER) bash -c "source developer-settings && env" > /tmp/mkenv)
 ifneq ($(.SHELLSTATUS),0)
 $(error Failed to source developer-settings file)
 endif
