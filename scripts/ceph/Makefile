@@ -15,11 +15,11 @@ export CMAKE_FLAGS ?= -DWITH_CCACHE=1 \
 # TODO: Should I also build Mon and MDS like in Rasputin project?
 export CEPH_BINARIES_TO_BUILD ?= ceph-mgr
 
-ceph.repo.%:
+.ceph.repo:
 	@ $(BASH_CMD) -c 'if [[ ! -d $(CEPH_DIR)/.git/ ]] ; then \
 	    echo "  ERROR! Ceph has not been cloned to workspace; cannot continue!"; exit 1; fi'
 
-ceph.buildcontainer.%:
+.ceph.buildcontainer:
 	@ echo "Ensuring ceph-build container. Takes a LONG time at first run, just a second after."
 	@ $(DOCKER) build -t ceph-build scripts/ceph/build-container
 
@@ -30,7 +30,7 @@ $(CCACHE_DIR):
 ##
 ## CEPH BUILD TARGETS
 ##   ceph.build: (TODO: DESCRIPTION, TODO: fix broken build)
-ceph.build: ceph.repo.% ceph.buildcontainer.% $(CCACHE_DIR)
+ceph.build: .ceph.repo .ceph.buildcontainer $(CCACHE_DIR)
 	@ $(BASH_CMD) scripts/ceph/build-in-dockerfile.sh
 
 export CEPH_BASE_IMAGE ?= ceph/daemon-base
@@ -38,7 +38,7 @@ export CEPH_BASE_IMAGE ?= ceph/daemon-base
 ##                          image as ${IMG}ceph/ceph:local${NON}.
 ##                          Default base image: ${ENV}CEPH_BASE_IMAGE=${CEPH_BASE_IMAGE}${NON}.
 PYTHON_COPY_DIR ?= scripts/ceph/ceph-container/.python-files
-ceph.build.image: ceph.repo.%
+ceph.build.image: .ceph.repo
 	@ echo '  BUILDING CEPH IMAGE AS ceph/ceph:local'
 	@ rm -rf $(PYTHON_COPY_DIR) && mkdir --parents $(PYTHON_COPY_DIR)
 	@ cp -a ceph/src/python-common $(PYTHON_COPY_DIR)/python-common

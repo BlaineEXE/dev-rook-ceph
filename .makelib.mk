@@ -1,4 +1,4 @@
-include tools.mk
+include .tools.mk
 export
 
 # Bash is required as the shell

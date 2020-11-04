@@ -1,4 +1,4 @@
-include makelib.mk
+include .makelib.mk
 
 # Make sure git doesn't track others' changes to developer-settings
 $(shell git update-index --assume-unchanged developer-settings)
@@ -36,7 +36,7 @@ cluster.pause: .kvmn.stop
 
 ##   cluster.destroy    Destroy the previously-built development cluster
 cluster.destroy: .kvmn.clean .kvmn.clean-data .kvmn.clean-force
-	@ $(MAKE) rook.destroy-hook.%
+	@ $(MAKE) .rook.destroy-hook
 
 ##   cluster.push-image Push a local image ${ENV}IMG${NON} to the dev cluster [optional: as tag ${ENV}TAG${NON}]
 cluster.push-image: .kvmn.load-image
@@ -78,8 +78,8 @@ include scripts/upgrade/Makefile
 ## ADVANCED
 ##  Set ${ENV}DEBUG=1${NON} when using ${CMD}make${NON} to run dev env scripts with additional debug output.
 
-# call.script.% SCRIPT=<script-path> - to call a single script with make's env vars set up
-call.script.%:
+# .call.script SCRIPT=<script-path> - to call a single script with make's env vars set up
+.call.script:
 	@ $(BASH_CMD) $(SCRIPT)
 
 #

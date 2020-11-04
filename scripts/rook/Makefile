@@ -28,11 +28,11 @@ override CURRENT_BUILT_BRANCH_FILE := scripts/rook/_current-built-branch
 
 
 # ensure the rook repo is cloned to this project
-rook.repo.%: $(GO_TOOL)
+.rook.repo: $(GO_TOOL)
 	@ $(BASH_CMD) -c 'if ! git -C $(ROOK_REPO_DIR) status >/dev/null; then \
 	    echo "  ERROR! Rook repo is not cloned to ROOK_REPO_DIR=$(ROOK_REPO_DIR); cannot continue!"; exit 1; fi'
 
-rook.make.%: $(GO_TOOL) rook.repo.%
+.rook.make.%: $(GO_TOOL) .rook.repo
 	@ $(BASH_CMD) scripts/rook/make-ceph.sh $*
 
 ##
@@ -40,35 +40,35 @@ rook.make.%: $(GO_TOOL) rook.repo.%
 
 ##   rook.build         Build Rook locally, and push the Rook image to nodes as ${IMG}rook/ceph:master${NON}
 ##   rook.build.nopush  Build Rook locally, but do not push the Rook image to nodes
-rook.build: rook.repo.%
-	@ $(MAKE) rook.build.startmsg.%
-	@ $(MAKE) rook.make.build
+rook.build: .rook.repo
+	@ $(MAKE) .rook.build.startmsg
+	@ $(MAKE) .rook.make.build
 	@ $(MAKE) .rook.build.push
-	@ $(MAKE) rook.build.showinfo.%
-rook.build.nopush: rook.repo.%
-	@ $(MAKE) rook.build.startmsg.%
+	@ $(MAKE) .rook.build.showinfo
+rook.build.nopush: .rook.repo
+	@ $(MAKE) .rook.build.startmsg
 	@ echo '    (NOT PUSHING BUILT IMAGES TO DEV CLUSTER)'
-	@ $(MAKE) rook.make.build
-	@ $(MAKE) rook.build.showinfo.%
+	@ $(MAKE) .rook.make.build
+	@ $(MAKE) .rook.build.showinfo
 # Store branch name from most recent image built and pushed to nodes so we can print it for the user
 # Makefile is more complicated, but gives the dev important reminder about what is being installed
 $(CURRENT_BUILT_BRANCH_FILE):
 	@ echo '  WARNING! There is no record of a built image pushed to nodes'
 	@ echo '  This is not an error if the config file specifies an upstream image'
-rook.print-built-branch.%:
+.rook.print-built-branch:
 	@ echo "  CURRENT BUILT BRANCH: $$(cat $(CURRENT_BUILT_BRANCH_FILE) 2> /dev/null)"
 .rook.build.push:
 	@ # Rook integration tests assume the image under test is "rook/ceph:master"
 	@ $(MAKE) cluster.push-image IMG="rook-build/ceph-$(GOARCH)" TAG="rook/ceph:master"
 	@ git -C rook/ rev-parse --abbrev-ref HEAD > $(CURRENT_BUILT_BRANCH_FILE) # store branch
-rook.build.showinfo.%:
+.rook.build.showinfo:
 	@ bash scripts/resources/success-message.sh "ROOK BUILT"
 	@ $(MAKE) rook.showinfo
-rook.build.startmsg.%:
+.rook.build.startmsg:
 	@ printf "\n  BUILDING ROOK BRANCH %s\n" "$$(git -C rook/ rev-parse --abbrev-ref HEAD)"
 
 ##   rook.test          Run unit tests on Rook.
-rook.test: rook.make.test
+rook.test: .rook.make.test
 	@ bash scripts/resources/success-message.sh "ROOK UNIT TESTS PASSED"
 
 ##   rook.integration   Run Rook integration tests. Specify a specific test by setting the ${ENV}TEST${NON} env
@@ -95,24 +95,24 @@ rook.integration?:
 ##   rook.set-config    Set the config branch by copying the current Rook branch's manifest files to
 ##                          ${DIR}.rook-config/${NON}. This allows you to have a consistent Rook
 ##                          config regardless of branch changes.
-rook.copy-config.%: rook.repo.% rook.unset-config
+.rook.copy-config: .rook.repo rook.unset-config
 # only copy the configs, don't store the branch
 	@ mkdir -p $(ROOK_CONFIG_DIR)
 	@ cp -a rook/cluster/examples/kubernetes/* $(ROOK_CONFIG_DIR)/.
-rook.set-config.%: rook.copy-config.%
+.rook.set-config: .rook.copy-config
 # copy configs AND store the branch
 # same as 'rook.set-config' but won't print 'rook.showinfo' afterwards; used by upgrade makefile
 	@ git -C rook/ rev-parse --abbrev-ref HEAD > $(CURRENT_CONFIG_BRANCH_FILE)
 $(CURRENT_CONFIG_BRANCH_FILE):
 	@ printf '  WARNING! There is no record of a config branch set for use\n'
 	@ printf '  using configs from the current branch: %s\n' "$$(git -C rook/ rev-parse --abbrev-ref HEAD)"
-	@ $(MAKE) rook.copy-config.%
+	@ $(MAKE) .rook.copy-config
 # ^ don't store the current branch in this case to keep using active branch by default
-rook.config-branch-file.%: rook.repo.% $(CURRENT_CONFIG_BRANCH_FILE) ;
+.rook.config-branch-file: .rook.repo $(CURRENT_CONFIG_BRANCH_FILE) ;
 # ^ use this to make a dependency on CURRENT_CONFIG_BRANCH_FILE so it gets symlink dependency too
-rook.print-config-branch.%:
+.rook.print-config-branch:
 	@ echo "  CURRENT CONFIG BRANCH: $$(cat $(CURRENT_CONFIG_BRANCH_FILE) 2> /dev/null)"
-rook.set-config: rook.set-config.%
+rook.set-config: .rook.set-config
 	@ $(MAKE) rook.showinfo
 
 ##   rook.unset-config  Unset the config branch to always use manifests from the active branch.
@@ -121,7 +121,7 @@ rook.unset-config:
 
 ##   rook.install       Install Rook on the cluster with the config files set via ${TGT}rook.set-config${NON}
 ##                          OR uses the active branch's config if a config branch is unset or not set.
-rook.install: rook.config-branch-file.%
+rook.install: .rook.config-branch-file
 # Always install with default PSPs enabled (could be changed by rook.integration)
 	@ $(BASH_CMD) scripts/rook/install.sh
 	@ # $(BASH_CMD) scripts/rook/install-filesystem.sh
@@ -130,7 +130,7 @@ rook.install: rook.config-branch-file.%
 
 ##   rook.uninstall     Uninstall Rook from the cluster using the most recently set (or installed)
 ##                          config files. Run this target before copying new configs.
-rook.uninstall: rook.config-branch-file.%
+rook.uninstall: .rook.config-branch-file
 	@ $(BASH_CMD) scripts/rook/uninstall.sh
 	@ sleep 10  # I think k8s needs time to flush the info from etcd
 	@ $(MAKE) rook.showinfo
@@ -139,8 +139,8 @@ rook.uninstall: rook.config-branch-file.%
 ##   rook.showinfo      Print info about the current Rook install/config.
 rook.showinfo:
 	@ echo ''
-	@ $(MAKE) rook.print-config-branch.%
-	@ $(MAKE) rook.print-built-branch.%
+	@ $(MAKE) .rook.print-config-branch
+	@ $(MAKE) .rook.print-built-branch
 	@ echo ''
 
 ##
@@ -200,5 +200,5 @@ rook.watch-pods:
 rook.help: scripts/rook/Makefile.help
 
 
-rook.destroy-hook.%:
+.rook.destroy-hook:
 	@ rm -f $(CURRENT_BUILT_BRANCH_FILE)
