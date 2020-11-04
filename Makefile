@@ -20,9 +20,10 @@ $(shell git update-index --assume-unchanged developer-settings)
 K8S_VAGRANT_DIR ?= $(PWD)/k8s-vagrant-multi-node
 
 # kvmn = k8s-vagrant-multi-node
-# hangs executing in parallel?
+# make with --jobs option hangs standing up nodes in parallel?
 .kvmn.%:
-	@ [[ -z "$(DEBUG)" ]] || env
+	@ $(BASH_CMD) -c 'if ! git -C $(K8S_VAGRANT_DIR) status >/dev/null; then \
+	    echo "  ERROR! k8s-vagrant-multi-node repo is not cloned to K8S_VAGRANT_DIR=$(K8S_VAGRANT_DIR); cannot continue!"; exit 1; fi'
 	@ $(MAKE) --directory=$(K8S_VAGRANT_DIR) $*
 
 ##   cluster.build      Stand up a cluster for development with params defined in ${FIL}developer-settings${NON}
