@@ -1,55 +1,18 @@
 #!/usr/bin/env bash
 
-#------------------#
-# Cluster settings #
-#------------------#
+#--------------------------------------------------------------------------------------------------#
+# Cluster settings
+#   dev-rook-ceph uses https://github.com/galexrt/k8s-vagrant-multi-node to stand up Kubernetes
+#   clusters. Refer to those docs for more settings that can be used to configure the cluster.
+#--------------------------------------------------------------------------------------------------#
 
-# Prevent cluster collisions in shared environments with a resource name prefix
-# Can safely be commented-out for local libvirt use
-export CLUSTER_PREFIX="${USER}-"
+export NODE_COUNT=2
 
-# Number of Kubernetes master and worker nodes to create for the dev cluster
-# One-node clusters should be a single master with no workers.
-export NUM_MASTERS=1
-export NUM_WORKERS=2
+export MASTER_CPUS=2
+export MASTER_MEMORY_SIZE_GB=2048
 
-# Configure how the cluster nodes are configured.
-# The node OS image is a URL which will be downloaded
-export NODE_OS_IMAGE="https://download.opensuse.org/distribution/leap/15.1/jeos/openSUSE-Leap-15.1-JeOS.x86_64-15.1.0-OpenStack-Cloud-Current.qcow2"
-export NODE_ROOK_VOLUMES=2   # Add this many volumes to each cluster node
-export NODE_ROOK_VOLUME_SIZE_GB=10  # Size of added volumes in Gigabytes
-export NODE_VCPUS=2
-export NODE_RAM_MB=2048
+export NODE_CPUS=2
+export NODE_MEMORY_SIZE_GB=2048
 
-export NET_DOMAIN_NAME="rook-dev.net"
-export NET_CIDR="172.60.0.0/22"
-
-
-#---------------------#
-# Kubernetes settings #
-#---------------------#
-
-export K8S_VERSION=v1.18.6
-
-# This serves a dual purpose: (1) define a location to download the cluster kubeconfig, and
-# (2) define said kubeconfig file as the env var which kubectl uses to find the config file
-export KUBECONFIG="${PWD}/kubeconfig"
-
-export KUBERNETES_DASHBOARD_YAML="https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml"
-export KUBERNETES_DASHBOARD_NAMESPACE="kubernetes-dashboard"
-export KUBERNETES_DASHBOARD_LOCAL_PORT=20443
-
-#------------------#
-# Libvirt settings #
-#------------------#
-export LIBVIRT_URI="qemu:///system"
-
-# NODE_OS_IMAGE will be downloaded to this pool
-export LIBVIRT_IMAGE_DOWNLOAD_POOL="default"
-
-# OS disks for nodes will be created in this pool; os disks in particular can benefit from using a
-# pool backed by solid state disks
-export LIBVIRT_OS_VOL_POOL="default"
-
-# extra volumes used for Rook storage will be created in this pool
-export LIBVIRT_ROOK_VOL_POOL="default"
+export DISK_COUNT=2
+export DISK_SIZE_GB=10

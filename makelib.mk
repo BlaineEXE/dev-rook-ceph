@@ -1,6 +1,9 @@
 include tools.mk
 export
 
+# Bash is required as the shell
+SHELL := /usr/bin/env bash
+
 # Entering/Leaving directory messages are annoying and not very useful
 MAKEFLAGS += --no-print-directory
 

@@ -35,11 +35,12 @@ export PATH := $(GOROOT)/bin:$(PATH)
 # Local dev go tool
 # Install go from upstream since packaged go might not have the latest features, which
 # sometimes can speed up build times.
-GO_TARFILE=go$(GO_VERSION).linux-amd64.tar.gz
+OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
+GO_TARFILE=go$(GO_VERSION).$(OS)-amd64.tar.gz
 $(GO_TOOL):
-	@ echo ' === downloading go version $(GO_VERSION) === '
+	@ echo ' === downloading go version $(GO_VERSION). === '
 	@ rm -rf $(GOROOT)
 	@ curl --location --create-dirs https://dl.google.com/go/$(GO_TARFILE) --output $(GO_TARFILE)
 	@ tar -C $(TOOLS_DIR) -xzf $(GO_TARFILE)
 	@ mv $(TOOLS_DIR)/go/ $(GOROOT)
-	@ rm -f go$(GO_VERSION).linux-amd64.tar.gz
+	@ rm -f $(GO_TARFILE)

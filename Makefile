@@ -14,58 +14,45 @@ $(shell git update-index --assume-unchanged developer-settings)
 ##  Configuration is not requred, as sensible default values are already applied. If desired, the user
 ##  should set their configuration overrides in the ${FIL}developer-settings${NON} file.
 
-##
-## QUICKSTART
-##   quickstart         Perform all steps to set up a Kubernetes cluster ready for Rook development
-##                          with params defined in ${FIL}developer-settings${NON}
-quickstart:
-	@ $(MAKE) cluster.build cluster.setup k8s.install
 
 ##
 ## CLUSTER TARGETS
+K8S_VAGRANT_DIR ?= $(PWD)/k8s-vagrant-multi-node
+
+# kvmn = k8s-vagrant-multi-node
+# hangs executing in parallel?
+.kvmn.%:
+	@ [[ -z "$(DEBUG)" ]] || env
+	@ $(MAKE) --directory=$(K8S_VAGRANT_DIR) $*
+
 ##   cluster.build      Stand up a cluster for development with params defined in ${FIL}developer-settings${NON}
-cluster.build:
-	@ $(SUDO) $(PYTHON) scripts/libvirt/apply.py
-	@ $(SUDO) $(PYTHON) scripts/libvirt/generate-node-list.py
-
-##   cluster.destroy    Destroy a previously-built development cluster
-cluster.destroy:
-	@ NUM_MASTERS=0 NUM_WORKERS=0 $(SUDO) $(PYTHON) scripts/libvirt/apply.py
-	@ rm -f _node-list
-	@ rm -f $(KUBECONFIG)
-	@ $(MAKE) rook.destroy-hook.%
-
-##   cluster.setup      Set up the cluster's basic user tooling
-cluster.setup: $(OCTOPUS_TOOL)
-	@ $(BASH_CMD) -c "chmod 600 scripts/resources/.ssh/id_rsa"
-	@ $(BASH_CMD) scripts/cluster/config-octopus.sh
-	@ $(BASH_CMD) scripts/cluster/wait-for-up.sh
-	@ $(BASH_CMD) scripts/cluster/copy-octopus-to-cluster.sh
-	@ $(BASH_CMD) scripts/cluster/install-dependencies.sh
-	@ $(BASH_CMD) scripts/cluster/set-iptables-permissive.sh
-	@ $(BASH_CMD) scripts/cluster/exercise-ssh.sh
-	@ $(BASH_CMD) scripts/cluster/setup-bashrc.sh
-	@ $(BASH_CMD) scripts/cluster/verify.sh
-
-
-##
-## KUBERNETES TARGETS
-##   k8s.install        Install Kubernetes on the cluster with params defined in ${FIL}developer-settings${NON}
-k8s.install: $(OCTOPUS_TOOL)
-	@ $(BASH_CMD) scripts/kubernetes/install-kubeadm.sh
-	@ $(BASH_CMD) scripts/kubernetes/install-k8s.sh
-	@ $(BASH_CMD) scripts/kubernetes/download-kubeconfig.sh
-	@ $(BASH_CMD) scripts/kubernetes/wait-for-up.sh
+cluster.build: .kvmn.up
 	@ $(BASH_CMD) scripts/kubernetes/untaint-master.sh
+	@ $(BASH_CMD) scripts/kubernetes/wait-for-up.sh
 	@ $(BASH_CMD) scripts/kubernetes/verify.sh
 
-##   k8s.dash-install   Install kubernetes-dashboard with params defined in ${FIL}developer-settings${NON}
-k8s.dash-install:
-	@ $(BASH_CMD) scripts/kubernetes/install-dashboard.sh
+##   cluster.pause      Pause the previously-built developmet cluster.
+cluster.pause: .kvmn.stop
 
-##   k8s.fwd-dash       Port forward the kubernetes-dashboard service to localhost:20443.
-k8s.fwd-dash:
-	@ $(BASH_CMD) scripts/kubernetes/dashboard-port-forward.sh
+##   cluster.destroy    Destroy the previously-built development cluster
+cluster.destroy: .kvmn.clean .kvmn.clean-data .kvmn.clean-force
+	@ $(MAKE) rook.destroy-hook.%
+
+##   cluster.push-image Push a local image ${ENV}IMG${NON} to the dev cluster [optional: as tag ${ENV}TAG${NON}]
+cluster.push-image: .kvmn.load-image
+
+##   cluster.ssh        SSH to the cluster master node
+cluster.ssh: .kvmn.ssh-master
+
+# ##   cluster.setup      Set up the cluster's basic user tooling
+# cluster.setup: $(OCTOPUS_TOOL)
+# 	@ $(BASH_CMD) -c "chmod 600 scripts/resources/.ssh/id_rsa"
+# 	@ $(BASH_CMD) scripts/cluster/config-octopus.sh
+# 	@ $(BASH_CMD) scripts/cluster/wait-for-up.sh
+# 	@ $(BASH_CMD) scripts/cluster/copy-octopus-to-cluster.sh
+# 	@ $(BASH_CMD) scripts/cluster/exercise-ssh.sh
+# 	@ $(BASH_CMD) scripts/cluster/setup-bashrc.sh
+# 	@ $(BASH_CMD) scripts/cluster/verify.sh
 
 
 ##

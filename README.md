@@ -27,15 +27,11 @@ Prerequisites
  - bash
  - curl
  - docker
- - libvirt-client
- - libvirt-daemon
- - libvirt-daemon-qemu
- - libvirt-python - https://pypi.org/project/libvirt-python/
+ - vagrant
+ - virtualbox
  - kubectl
  - python3
  - python3-PyYAML
- - qemu
- - qemu-kvm
  - jq
  - wget
 

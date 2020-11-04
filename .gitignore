@@ -10,6 +10,8 @@
 
 /developer-settings
 
+/k8s-vagrant-multi-node
+
 /rook
 /scripts/rook/_*
 /_output
