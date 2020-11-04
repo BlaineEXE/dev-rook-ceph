@@ -28,29 +28,14 @@ Prerequisites
  - curl
  - docker
  - vagrant
+ - vagrant plugin vagrant-reload
  - virtualbox
  - kubectl
- - python3
- - python3-PyYAML
  - jq
  - wget
 
 ### Go
-The environment will install Go for compiling Rook, but the user is still expected to have Go
-installed. At minimum, the user must have the `GOPATH` environment variable set, and the Rook
-repository should be cloned to `$GOPATH/src/github.com/rook/rook`.
-
-### Octopus
-Octopus is a CLI tool for executing commands on and copying files to multiple hosts in parallel
-created for this use-case. It is installed automatically by this environment and used for setting up
-the cluster. As well, it is installed for the `root` user on all cluster nodes. Octopus gets its
-host lists from a file (`_node-list`) written in bash variable syntax (as opposed to something like
-a `genders` file). This allows the host lists to be used by both Octopus and by bash scripts. It
-also supports hosts defined as IP addresses rather than requiring host names to be specified.
-
-The user may opt to install Octopus for themselves locally, which would allow easy use of the
-`octopus` CLI tool from the dev environment root dir, which is set up with a `.octopus`
-configuration dir. See https://github.com/BlaineEXE/octopus/releases for more.
+The environment will install Go for compiling Rook.
 
 
 Quickstart
@@ -58,7 +43,7 @@ Quickstart
 1. See: `make help`
 1. See: `make rook.help`
 1. Make any config changes you wish.
-1. Run `make quickstart`
+1. Run `make cluster.build`
 
 
 More documentation
@@ -67,4 +52,5 @@ See `/doc` for more documentation.
 
 Environments
 -------------
-Currently, the only supported environment for building Kubernetes clusters for Rook is `libvirt`.
+Currently, the only supported environment for building Kubernetes clusters for Rook is created by
+[k8s-vagrant-multi-node](https://github.com/galexrt/k8s-vagrant-multi-node).
