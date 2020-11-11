@@ -27,10 +27,10 @@ override CURRENT_BUILT_BRANCH_FILE := scripts/rook/_current-built-branch
 
 # If the cluster doesn't have 3 total nodes, we should use *-test.yaml manifests
 ifeq ($(shell test $(NODE_COUNT) -lt 2; echo $$?), 0)
-	ROOK_CLUSTER_FILE ?= cluster-test.yaml
-	ROOK_FILESYSTEM_FILE ?= filesystem-test.yaml
-	ROOK_OBJECT_FILE ?= object-test.yaml
-	ROOK_NFS_FILE ?= nfs-test.yaml
+ROOK_CLUSTER_FILE ?= cluster-test.yaml
+ROOK_FILESYSTEM_FILE ?= filesystem-test.yaml
+ROOK_OBJECT_FILE ?= object-test.yaml
+ROOK_NFS_FILE ?= nfs-test.yaml
 endif
 ROOK_CLUSTER_FILE ?= cluster.yaml
 ROOK_FILESYSTEM_FILE ?= filesystem.yaml

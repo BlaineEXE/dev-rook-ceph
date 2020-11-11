@@ -6,8 +6,7 @@
 /.upgrade-to-config/
 /.cluster
 
-/_node-list
-/kubeconfig
+/scripts/rook/_*
 
 /developer-settings
 

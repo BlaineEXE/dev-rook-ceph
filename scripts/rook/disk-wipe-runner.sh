@@ -16,7 +16,6 @@ done
 boot_disk="$(fdisk --list | \
   grep --extended-regexp '(boot|/dev/.*\*)' | \
   grep --only-matching --extended-regexp '/dev/[vs]d[a-z]+')"
-ls /dev/s*
 rook_disks="$(find /dev -regex '/dev/[vs]d[a-z]+$' -and -not -wholename "${boot_disk}")"
 
 # zap the disks to a fresh, usable state after LVM info is delted
