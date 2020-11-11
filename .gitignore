@@ -4,6 +4,7 @@
 /.tools/
 /.upgrade-from-config/
 /.upgrade-to-config/
+/.cluster
 
 /_node-list
 /kubeconfig
@@ -13,12 +14,8 @@
 /k8s-vagrant-multi-node
 
 /rook
-/scripts/rook/_*
 /_output
 
 /ceph
-
-/supportutils-plugin-rook
-/supportutils-plugin-ses
 
 __pycache__

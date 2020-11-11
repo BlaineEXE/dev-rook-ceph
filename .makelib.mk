@@ -1,41 +1,40 @@
-include .tools.mk
-export
-
 # Bash is required as the shell
 SHELL := /usr/bin/env bash
 
+include .tools.mk
+export
+
 # Entering/Leaving directory messages are annoying and not very useful
 MAKEFLAGS += --no-print-directory
-
-ifneq (4.2,$(firstword $(sort $(MAKE_VERSION) 4.2)))
-$(error Requires make version 4.2+)
-endif
 
 # This roundabout way of importing variables from 'developer-settings' works around the issue that
 # gnumake will read in quotes from variables if `developer-settings` is included directly.
 # e.g., var="val" will be read is as ["val"] instead of just [val]
 # Preserve PATH and USER env vars
-$(shell env -i - PATH=$(PATH) USER=$(USER) bash -c "source developer-settings && env" > /tmp/mkenv)
-ifneq ($(.SHELLSTATUS),0)
+ret := $(shell env -i - PATH=$(PATH) USER=$(USER) bash -c "source developer-settings && env" > /tmp/mkenv; echo $$?)
+ifneq ($(ret),0)
 $(error Failed to source developer-settings file)
 endif
 include /tmp/mkenv
 export
 
 
-export SUDO ?= sudo --preserve-env
+export ANSIBLE ?= ansible
 export BASH_CMD ?= bash
 export PYTHON ?= python3
 export GO ?= $(GO_TOOL)
-export OCTOPUS ?= $(OCTOPUS_TOOL)
 export DOCKER ?= docker
 
 
 ifdef DEBUG
 export BASH_CMD += -x
-export OCTOPUS += -v
 export DOCKER += --debug
 endif
+
+
+export MULTI_SSH := $(BASH_CMD) scripts/resources/multi-ssh.sh
+export MULTI_COPY := $(BASH_CMD) scripts/resources/multi-copy.sh
+
 
 # Text style definitions ...
 # no style

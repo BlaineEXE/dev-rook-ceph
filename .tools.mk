@@ -2,18 +2,12 @@ TOOLS_DIR := $(PWD)/.tools
 $(shell mkdir -p $(TOOLS_DIR) > /dev/null)
 
 #
-# Octopus
+# Required executables
 #
+EXECUTABLES = ansible bash curl docker jq kubectl vagrant
+_ := $(foreach exec,$(EXECUTABLES),\
+  $(if $(shell command -v $(exec)),some string,$(error "No $(exec) in PATH")))
 
-export OCTOPUS_VERSION ?= v2.0.1
-export OCTOPUS_TOOL := $(TOOLS_DIR)/octopus-$(OCTOPUS_VERSION)
-
-# Make sure octopus tool exists for use from the local dev environment
-$(OCTOPUS_TOOL):
-	@ echo ' === downloading Octopus version $(OCTOPUS_VERSION) === '
-	@ curl --location --create-dirs --output $(OCTOPUS_TOOL) \
-	  https://github.com/BlaineEXE/octopus/releases/download/$(OCTOPUS_VERSION)/octopus-static-$(OCTOPUS_VERSION)-$(GOOS)-$(GOARCH)
-	@ chmod +x $(OCTOPUS_TOOL)
 
 #
 # Go(lang)

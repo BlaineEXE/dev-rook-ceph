@@ -13,6 +13,9 @@ echo 'INSTALLING ROOK-CEPH'
 DEFAULT_PSP="${root_dir}/scripts/rook/default-psp.yaml"
 
 ( cd "${ROOK_CONFIG_DIR}"/ceph
+  if [[ -s crd.yaml ]]; then
+    kubectl apply -f crd.yaml
+  fi
   if [[ -s common.yaml ]]; then
     # common.yaml does not exist for v0.9
     kubectl apply -f common.yaml
@@ -43,7 +46,7 @@ DEFAULT_PSP="${root_dir}/scripts/rook/default-psp.yaml"
 )
 
 # Wait for all osd prepare pods to be completed
-num_osd_nodes=$((NUM_WORKERS + NUM_MASTERS))
+num_osd_nodes=$(( NODE_COUNT + 1 ))
 wait_for "Ceph to be installed" ${INSTALL_TIMEOUT} \
   "[[ \$(kubectl get --namespace ${ROOK_NAMESPACE} pods 2>&1 | grep -c 'rook-ceph-osd-prepare.*Completed') -eq $num_osd_nodes ]]"
 

@@ -1,10 +1,19 @@
 #!/usr/bin/env bash
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# shellcheck source=_default-dev-settings
 source "${SCRIPT_DIR}/_default-dev-settings"
 
 # Add your own overrides to the default-dev-settings here
 # examples:
-# export K8S_VERSION="v1.12.4"
-# export CLUSTER_PREFIX=""
-# export LIBVIRT_OS_VOL_POOL="ssd"
+
+# export NODE_COUNT=2
+
+# export MASTER_CPUS=2
+# export MASTER_MEMORY_SIZE_GB=2
+
+# export NODE_CPUS=2
+# export NODE_MEMORY_SIZE_GB=2
+
+# export DISK_COUNT=2
+# export DISK_SIZE_GB=10

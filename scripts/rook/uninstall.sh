@@ -32,14 +32,10 @@ delete_test_pod
 # Rook won't overwrite existing data, so delete the data on rook destroy
 echo ''
 echo 'DELETING ROOK DATA FROM NODES'
-${OCTOPUS} --host-groups all run \
-  'dir=/home/ses          ; rm -rf "$dir"/* ; echo "$dir contents:" ; cd "$dir" 2>/dev/null && ls
-   dir=/var/lib/rook      ;  rm -rf "$dir"/* ; echo "$dir contents:" ; cd "$dir" 2>/dev/null && ls
-   dir=/var/lib/rook-ceph ; rm -rf "$dir"/* ; echo "$dir contents:" ; cd "$dir" 2>/dev/null && ls
-   exit 0'
+${MULTI_SSH} all 'rm -rf /var/lib/rook'
 
 set -Ee
-${BASH_CMD} scripts/rook/wipe-disks.sh
+${MULTI_SSH} all scripts/rook/disk-wipe-runner.sh
 set +Ee
 
 # Wait for rook pods to be done running
@@ -61,5 +57,4 @@ wait_for "Rook namespaces to be deleted" 210 \
 # dev Rook-Ceph cluster is created. So find the Rook-/Ceph-related ETCD resources, and remove them.
 # get the ETCD container on the master node (cannot be a pause container)
 echo 'WIPE ETCD'
-${OCTOPUS} --host-groups first_master copy scripts/rook/rook-etcd-wipe-runner.sh /root
-${OCTOPUS} --host-groups first_master run "${BASH_CMD} /root/rook-etcd-wipe-runner.sh"
+${MULTI_SSH} master scripts/rook/etcd-wipe-runner.sh

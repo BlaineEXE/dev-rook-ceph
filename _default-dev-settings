@@ -6,13 +6,10 @@
 #   clusters. Refer to those docs for more settings that can be used to configure the cluster.
 #--------------------------------------------------------------------------------------------------#
 
-export NODE_COUNT=2
+export NODE_COUNT=0
 
-export MASTER_CPUS=2
-export MASTER_MEMORY_SIZE_GB=2048
+export MASTER_CPUS=6
+export MASTER_MEMORY_SIZE_GB=6
 
-export NODE_CPUS=2
-export NODE_MEMORY_SIZE_GB=2048
-
-export DISK_COUNT=2
+export DISK_COUNT=6
 export DISK_SIZE_GB=10

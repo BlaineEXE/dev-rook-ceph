@@ -28,7 +28,7 @@ Prerequisites
  - curl
  - docker
  - vagrant
- - vagrant plugin vagrant-reload
+ - vagrant plugin: vagrant-reload
  - virtualbox
  - kubectl
  - jq
@@ -45,10 +45,6 @@ Quickstart
 1. Make any config changes you wish.
 1. Run `make cluster.build`
 
-
-More documentation
--------------------
-See `/doc` for more documentation.
 
 Environments
 -------------

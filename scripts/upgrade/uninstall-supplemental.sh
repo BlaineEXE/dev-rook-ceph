@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-# delete what may have been created
-for delete_me in ${UPGRADE_TO_CONFIG_DIR}/ceph/upgrade-*-create.yaml; do
-  kubectl delete -f "${delete_me}" --wait=false
-done
+echo "Uninstalling additional upgrade resources that may apply..."
+
+find ${UPGRADE_TO_CONFIG_DIR}/ceph/ -name 'crds.yaml' -exec kubectl delete -f {} \;
+find ${UPGRADE_TO_CONFIG_DIR}/ceph/ -name 'upgrade-*-crd*.yaml' -exec kubectl delete -f {} \;
+find ${UPGRADE_TO_CONFIG_DIR}/ceph/ -name 'upgrade-*-create.yaml' -exec kubectl delete -f {} \;
+find ${UPGRADE_TO_CONFIG_DIR}/ceph/ -name 'upgrade-*-apply.yaml' -exec kubectl delete -f {} \;
 
 exit 0  # uninstallation is on a best-effort basis

@@ -17,23 +17,35 @@
 ##    5.  Iterate on code/config changes             ${HDR}ROOK ITERATION TARGETS${NON}  (from any branch)
 ##    6.  Uninstall Rook before starting a new flow  ${CMD}make rook.uninstall${NON}     (from any branch)
 
-# Targets followed by '%' are hidden from make's tab complete. These targets can be called via
-# `make target.%`; however, this is an advanced usage not documented in the help text.
-# Run a Rook make target with only the Ceph backend
+# Targets preceded by '.' are hidden from make's tab complete. These targets can be called via
+# `make .target`; however, this is an advanced usage not documented in the help text.
 
 ROOK_REPO_DIR ?= $(PWD)/rook
 ROOK_CONFIG_DIR ?= $(PWD)/.rook-config
 override CURRENT_CONFIG_BRANCH_FILE := $(ROOK_CONFIG_DIR)/_current-config-branch
 override CURRENT_BUILT_BRANCH_FILE := scripts/rook/_current-built-branch
 
+# If the cluster doesn't have 3 total nodes, we should use *-test.yaml manifests
+ifeq ($(shell test $(NODE_COUNT) -lt 2; echo $$?), 0)
+	ROOK_CLUSTER_FILE ?= cluster-test.yaml
+	ROOK_FILESYSTEM_FILE ?= filesystem-test.yaml
+	ROOK_OBJECT_FILE ?= object-test.yaml
+	ROOK_NFS_FILE ?= nfs-test.yaml
+endif
+ROOK_CLUSTER_FILE ?= cluster.yaml
+ROOK_FILESYSTEM_FILE ?= filesystem.yaml
+ROOK_OBJECT_FILE ?= object.yaml
+ROOK_NFS_FILE ?= nfs.yaml
 
 # ensure the rook repo is cloned to this project
 .rook.repo: $(GO_TOOL)
 	@ $(BASH_CMD) -c 'if ! git -C $(ROOK_REPO_DIR) status >/dev/null; then \
 	    echo "  ERROR! Rook repo is not cloned to ROOK_REPO_DIR=$(ROOK_REPO_DIR); cannot continue!"; exit 1; fi'
 
+# Run a Rook make target with only the Ceph backend
 .rook.make.%: $(GO_TOOL) .rook.repo
 	@ $(BASH_CMD) scripts/rook/make-ceph.sh $*
+
 
 ##
 ## ROOK BUILD/TEST TARGETS
@@ -89,6 +101,7 @@ rook.integration?:
 # ##   rook.unpush        Remove the pushed ${IMG}rook/rook:master${NON} image from nodes so that installs and
 # ##                          tests will use the upstream image.
 
+
 ##
 ## ROOK INSTALL TARGETS
 
@@ -128,6 +141,10 @@ rook.install: .rook.config-branch-file
 	@ $(BASH_CMD) scripts/resources/success-message.sh "ROOK INSTALLED"
 	@ $(MAKE) rook.showinfo
 
+##   rook.install.stg   Install all of the Rook storage types. Only valuable after Rook is already installed.
+rook.install.stg:
+	@ $(BASH_CMD) scripts/rook/install-storage.sh
+
 ##   rook.uninstall     Uninstall Rook from the cluster using the most recently set (or installed)
 ##                          config files. Run this target before copying new configs.
 rook.uninstall: .rook.config-branch-file
@@ -142,6 +159,7 @@ rook.showinfo:
 	@ $(MAKE) .rook.print-config-branch
 	@ $(MAKE) .rook.print-built-branch
 	@ echo ''
+
 
 ##
 ## ROOK ITERATION TARGETS
@@ -170,6 +188,7 @@ rook.rebuild:
 rook.reconfig: rook.uninstall rook.set-config rook.install rook.showinfo
 	@ bash scripts/resources/success-message.sh "ROOK IS REINSTALLED WITH A NEW CONFIG"
 
+
 ##
 ## ROOK DEV/DEBUG TARGETS
 ##   rook.toolbox-connect  Connect to the Rook toolbox.
@@ -191,6 +210,7 @@ rook.restart-operator:
 ##   rook.watch-pods       Watch Rook pods with ${CMD}watch${NON}
 rook.watch-pods:
 	@ watch --no-title kubectl --namespace $(ROOK_NAMESPACE) get pods
+
 
 #
 # Help

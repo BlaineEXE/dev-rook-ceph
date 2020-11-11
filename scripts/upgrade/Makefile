@@ -32,7 +32,7 @@ $(UPGRADE_FROM_CONFIG_DIR):
 	@ exit 1
 upgrade.from:
 	@ rm -rf $(UPGRADE_FROM_CONFIG_DIR)
-	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_FROM_CONFIG_DIR) rook.set-config.%
+	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_FROM_CONFIG_DIR) .rook.set-config
 	@ $(MAKE) upgrade.showinfo
 
 ##   upgrade.to         Just as with ${TGT}rook.set-config${NON}, set configs for the post-upgrade cluster by
@@ -40,12 +40,12 @@ upgrade.from:
 $(UPGRADE_TO_CONFIG_DIR):
 	@ printf '  WARNING! No branch has been set to upgrade to\n'
 	@ printf '  using configs from the current branch: %s\n' "$$(git -C rook/ rev-parse --abbrev-ref HEAD)"
-	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_TO_CONFIG_DIR) rook.copy-config.%
+	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_TO_CONFIG_DIR) .rook.copy-config
 	@ $(MAKE) upgrade.showinfo
-# ^ rook.copy-config.% doesn't store the cfg branch so upgrade 'to' continues to be the active branch
+# ^ .rook.copy-config doesn't store the cfg branch so upgrade 'to' continues to be the active branch
 upgrade.to:
 	@ rm -rf $(UPGRADE_TO_CONFIG_DIR)
-	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_TO_CONFIG_DIR) rook.set-config.%
+	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_TO_CONFIG_DIR) .rook.set-config
 	@ $(MAKE) upgrade.showinfo
 
 ##   upgrade.unset-to   Just as with ${TGT}rook.unset-config${NON}, remove the stored post-upgrade cluster
@@ -59,8 +59,7 @@ upgrade.unset-to:
 ##   upgrade.install    Install the pre-upgrade cluster using configs set via ${TGT}upgrade.from${NON}.
 upgrade.install:  $(UPGRADE_FROM_CONFIG_DIR)
 # increase install timeout to account for possible pulling of upstream images
-	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_FROM_CONFIG_DIR) INSTALL_TIMEOUT=900 rook.install
-	@ $(BASH_CMD) scripts/upgrade/install-supplemental.sh
+	@ $(MAKE) ROOK_CONFIG_DIR=$(UPGRADE_FROM_CONFIG_DIR) rook.install rook.install.stg
 
 ##   upgrade.uninstall  Uninstall the post- and pre-upgrade cluster resources.
 upgrade.uninstall: $(UPGRADE_FROM_CONFIG_DIR)
@@ -73,7 +72,7 @@ upgrade.rook: $(UPGRADE_TO_CONFIG_DIR)
 	@ $(BASH_CMD) scripts/upgrade/rook.sh
 	@ bash scripts/resources/success-message.sh "UPGRADE IS COMMENCING. USER IS RESPONSIBLE FOR WATCHING UPGRADE."
 
-NEW_CEPH_IMAGE ?= ceph/ceph:v14.2
+NEW_CEPH_IMAGE ?= ceph/ceph:v15
 ##   upgrade.ceph       Upgrade the Ceph image to that defined by the env var ${ENV}NEW_CEPH_IMAGE${NON}.
 ##                          (default ${VAL}${NEW_CEPH_IMAGE}${NON})
 upgrade.ceph:

@@ -40,7 +40,7 @@ export CEPH_BASE_IMAGE ?= ceph/daemon-base
 PYTHON_COPY_DIR ?= scripts/ceph/ceph-container/.python-files
 ceph.build.image: .ceph.repo
 	@ echo '  BUILDING CEPH IMAGE AS ceph/ceph:local'
-	@ rm -rf $(PYTHON_COPY_DIR) && mkdir --parents $(PYTHON_COPY_DIR)
+	@ rm -rf $(PYTHON_COPY_DIR) && mkdir -p $(PYTHON_COPY_DIR)
 	@ cp -a ceph/src/python-common $(PYTHON_COPY_DIR)/python-common
 	@ cp -a ceph/src/ceph-volume   $(PYTHON_COPY_DIR)/ceph-volume
 	@ $(DOCKER) build -t ceph/ceph:local scripts/ceph/ceph-container

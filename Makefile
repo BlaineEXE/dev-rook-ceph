@@ -18,16 +18,23 @@ $(shell git update-index --assume-unchanged developer-settings)
 ##
 ## CLUSTER TARGETS
 K8S_VAGRANT_DIR ?= $(PWD)/k8s-vagrant-multi-node
+CLUSTER_DATA ?= $(PWD)/.cluster
+export NODE_LIST_FILE := $(CLUSTER_DATA)/node-list
+export ANSIBLE_CONFIG ?= $(CLUSTER_DATA)/ansible.cfg
 
 # kvmn = k8s-vagrant-multi-node
 # make with --jobs option hangs standing up nodes in parallel?
 .kvmn.%:
+	@ mkdir -p $(CLUSTER_DATA)
 	@ $(BASH_CMD) -c 'if ! git -C $(K8S_VAGRANT_DIR) status >/dev/null; then \
 	    echo "  ERROR! k8s-vagrant-multi-node repo is not cloned to K8S_VAGRANT_DIR=$(K8S_VAGRANT_DIR); cannot continue!"; exit 1; fi'
 	@ $(MAKE) --directory=$(K8S_VAGRANT_DIR) $*
 
 ##   cluster.build      Stand up a cluster for development with params defined in ${FIL}developer-settings${NON}
 cluster.build: .kvmn.up
+	@ $(MAKE) .kvmn.ssh-config > $(CLUSTER_DATA)/ssh_config
+	@ sed -n -e 's/^Host //p' $(CLUSTER_DATA)/ssh_config > $(NODE_LIST_FILE)
+	@ $(BASH_CMD) scripts/cluster/generate-ansible-cfg.sh > $(ANSIBLE_CONFIG)
 	@ $(BASH_CMD) scripts/kubernetes/untaint-master.sh
 	@ $(BASH_CMD) scripts/kubernetes/wait-for-up.sh
 	@ $(BASH_CMD) scripts/kubernetes/verify.sh
@@ -35,22 +42,31 @@ cluster.build: .kvmn.up
 ##   cluster.pause      Pause the previously-built developmet cluster.
 cluster.pause: .kvmn.stop
 
+##   cluster.unpause    Un-pause the previously-built development cluster.
+cluster.unpause: .kvmn.up
+
 ##   cluster.destroy    Destroy the previously-built development cluster
 cluster.destroy: .kvmn.clean .kvmn.clean-data .kvmn.clean-force
+	@ rm -rf $(CLUSTER_DATA)
 	@ $(MAKE) .rook.destroy-hook
 
-##   cluster.push-image Push a local image ${ENV}IMG${NON} to the dev cluster [optional: as tag ${ENV}TAG${NON}]
-cluster.push-image: .kvmn.load-image
+##   cluster.push-image Push a local image ${ENV}IMG${NON} to the dev cluster ${ENV}TAG${NON}
+cluster.push-image:
+	@	$(BASH_CMD) scripts/resources/push-image.sh "$(IMG)" "$(TAG)"
 
-##   cluster.ssh        SSH to the cluster master node
-cluster.ssh: .kvmn.ssh-master
+##   cluster.ssh        SSH to the cluster master node as root.
+cluster.ssh:
+	@ ssh -F $(CLUSTER_DATA)/ssh_config -t master "sudo su -"
+
+##   cluster.multi-ssh  Send SSH command ${ENV}CMD${NON} to node group ${ENV}GROUP${NON} (default ${ENV}GROUP=all${NON}).
+GROUP ?= all
+cluster.multi-ssh:
+	@ $(MULTI_SSH) "$(GROUP)" "$(CMD)"
 
 # ##   cluster.setup      Set up the cluster's basic user tooling
-# cluster.setup: $(OCTOPUS_TOOL)
+# cluster.setup:
 # 	@ $(BASH_CMD) -c "chmod 600 scripts/resources/.ssh/id_rsa"
-# 	@ $(BASH_CMD) scripts/cluster/config-octopus.sh
 # 	@ $(BASH_CMD) scripts/cluster/wait-for-up.sh
-# 	@ $(BASH_CMD) scripts/cluster/copy-octopus-to-cluster.sh
 # 	@ $(BASH_CMD) scripts/cluster/exercise-ssh.sh
 # 	@ $(BASH_CMD) scripts/cluster/setup-bashrc.sh
 # 	@ $(BASH_CMD) scripts/cluster/verify.sh
@@ -68,6 +84,7 @@ include scripts/rook/Makefile
 ## CEPH TARGETS
 ##   ceph.help          Show all Ceph targets
 include scripts/ceph/Makefile
+
 
 ##
 ## UPGRADE TARGETS
