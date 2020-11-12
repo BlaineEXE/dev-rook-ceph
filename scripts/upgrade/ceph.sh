@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-kubectl --namespace "${ROOK_NAMESPACE}" patch CephCluster rook-ceph --type=merge \
+# outputs cephcluster.ceph.rook.io/<cluster-name>
+cluster="$(kubectl --namespace "${ROOK_NAMESPACE}" get cephcluster --output name)"
+
+kubectl --namespace "${ROOK_NAMESPACE}" patch "${cluster}" --type=merge \
     --patch "{\"spec\": {\"cephVersion\": {\"image\": \"${NEW_CEPH_IMAGE}\"}}}"
