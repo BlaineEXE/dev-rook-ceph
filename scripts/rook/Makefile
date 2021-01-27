@@ -137,13 +137,30 @@ rook.unset-config:
 rook.install: .rook.config-branch-file
 # Always install with default PSPs enabled (could be changed by rook.integration)
 	@ $(BASH_CMD) scripts/rook/install.sh
-	@ # $(BASH_CMD) scripts/rook/install-filesystem.sh
 	@ $(BASH_CMD) scripts/resources/success-message.sh "ROOK INSTALLED"
 	@ $(MAKE) rook.showinfo
 
-##   rook.install.stg   Install all of the Rook storage types. Only valuable after Rook is already installed.
-rook.install.stg:
-	@ $(BASH_CMD) scripts/rook/install-storage.sh
+##   rook.install.fs    Install filesystem (fs).
+rook.install.fs: .rook.config-branch-file
+	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/${ROOK_FILESYSTEM_FILE}"
+
+##   rook.install.obj   Install object store.
+rook.install.obj: .rook.config-branch-file
+	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/${ROOK_OBJECT_FILE}"
+
+##   rook.install.obc   Install object bucket claim (OBC). Implies ${TGT}rook.install.obj${NON}.
+rook.install.obc: .rook.config-branch-file rook.install.obj
+	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/storageclass-bucket-delete.yaml" \
+	                -f "$(ROOK_CONFIG_DIR)/ceph/object-bucket-claim-delete.yaml"
+
+##   rook.install.nfs   Install NFS. Implies ${TGT}rook.install.fs${NON}.
+rook.install.nfs: rook.install.fs
+	@ cd $(ROOK_CONFIG_DIR)/ceph && \
+	  if [[ -f "${ROOK_NFS_FILE}" ]]; then kubectl apply -f "${ROOK_NFS_FILE}" ; \
+	  else kubectl apply -f nfs.yaml; fi # nfs-test.yaml introduced in rook v1.5
+
+##   rook.install.stg   Install all storage types - filesystem, object store, OBC, and NFS.
+rook.install.stg: rook.install.obc rook.install.nfs
 
 ##   rook.uninstall     Uninstall Rook from the cluster using the most recently set (or installed)
 ##                          config files. Run this target before copying new configs.
