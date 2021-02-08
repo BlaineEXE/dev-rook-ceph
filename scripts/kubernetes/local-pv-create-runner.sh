@@ -27,13 +27,13 @@ spec:
   local:
     path: "${disk_path}"
   nodeAffinity:
-      required:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: In
-                values:
-                - "${hostname}"
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+              - "${hostname}"
 EOF
 }
 

@@ -95,8 +95,7 @@ spec:
           resources:
             requests:
               storage: 10Gi
-          # IMPORTANT: Change the storage class depending on your environment (e.g. local-storage, gp2)
-          storageClassName: gp2
+          storageClassName: local
           volumeMode: Block
           accessModes:
             - ReadWriteOnce
