@@ -1,0 +1,135 @@
+#################################################################################################################
+# Define the settings for the rook-ceph cluster with common settings for a small test cluster.
+# All nodes with available raw devices will be used for the Ceph cluster. One node is sufficient
+# in this example.
+
+# For example, to create the cluster:
+#   kubectl create -f crds.yaml -f common.yaml -f operator.yaml
+#   kubectl create -f cluster-test.yaml
+#################################################################################################################
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rook-config-override
+  namespace: rook-ceph # namespace:cluster
+data:
+  config: |
+    [global]
+    osd_pool_default_size = 1
+    mon_warn_on_pool_no_redundancy = false
+---
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  name: my-cluster
+  namespace: rook-ceph # namespace:cluster
+spec:
+  dataDirHostPath: /var/lib/rook
+  cephVersion:
+    image: ceph/ceph:v15
+    allowUnsupported: true
+  mon:
+    count: 1
+    allowMultiplePerNode: true
+  dashboard:
+    enabled: true
+  crashCollector:
+    disable: true
+  storage:
+    storageClassDeviceSets:
+    - name: set1
+      # The number of OSDs to create from this device set
+      count: 3
+      portable: false
+      encrypted: false
+      tuneDeviceClass: false
+      tuneFastDeviceClass: false
+      # Since the OSDs could end up on any node, an effort needs to be made to spread the OSDs
+      # across nodes as much as possible. Unfortunately the pod anti-affinity breaks down
+      # as soon as you have more than one OSD per node. The topology spread constraints will
+      # give us an even spread on K8s 1.18 or newer.
+      placement:
+        topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - rook-ceph-osd
+      preparePlacement:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - rook-ceph-osd
+                - key: app
+                  operator: In
+                  values:
+                  - rook-ceph-osd-prepare
+              topologyKey: kubernetes.io/hostname
+        topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - rook-ceph-osd-prepare
+      volumeClaimTemplates:
+      - metadata:
+          name: data
+          # if you are looking at giving your OSD a different CRUSH device class than the one detected by Ceph
+          # annotations:
+          #   crushDeviceClass: hybrid
+        spec:
+          resources:
+            requests:
+              storage: 10Gi
+          # IMPORTANT: Change the storage class depending on your environment (e.g. local-storage, gp2)
+          storageClassName: gp2
+          volumeMode: Block
+          accessModes:
+            - ReadWriteOnce
+      # dedicated block device to store bluestore database (block.db)
+      # - metadata:
+      #     name: metadata
+      #   spec:
+      #     resources:
+      #       requests:
+      #         # Find the right size https://docs.ceph.com/docs/master/rados/configuration/bluestore-config-ref/#sizing
+      #         storage: 5Gi
+      #     # IMPORTANT: Change the storage class depending on your environment (e.g. local-storage, io1)
+      #     storageClassName: local
+      #     volumeMode: Block
+      #     accessModes:
+      #       - ReadWriteOnce
+      # dedicated block device to store bluestore wal (block.wal)
+      # - metadata:
+      #     name: wal
+      #   spec:
+      #     resources:
+      #       requests:
+      #         # Find the right size https://docs.ceph.com/docs/master/rados/configuration/bluestore-config-ref/#sizing
+      #         storage: 5Gi
+      #     # IMPORTANT: Change the storage class depending on your environment (e.g. local-storage, io1)
+      #     storageClassName: local
+      #     volumeMode: Block
+      #     accessModes:
+      #       - ReadWriteOnce
+  healthCheck:
+    daemonHealth:
+      mon:
+        interval: 45s
+        timeout: 600s
+  disruptionManagement:
+    managePodBudgets: true

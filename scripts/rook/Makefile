@@ -140,6 +140,12 @@ rook.install: .rook.config-branch-file
 	@ $(BASH_CMD) scripts/resources/success-message.sh "ROOK INSTALLED"
 	@ $(MAKE) rook.showinfo
 
+##   rook.install.pvc   Install Rook on PVCs.
+rook.install.pvc:
+	@ if ! kubectl get persistentvolumes --output name | grep "persistentvolume/local-" >/dev/null; then \
+	    $(MAKE) k8s.make-local-pvs; fi
+	@ ROOK_CLUSTER_FILE=$(PWD)/scripts/rook/cluster-on-pvc-test.yaml $(MAKE) rook.install
+
 ##   rook.install.fs    Install filesystem (fs).
 rook.install.fs: .rook.config-branch-file
 	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/${ROOK_FILESYSTEM_FILE}"
