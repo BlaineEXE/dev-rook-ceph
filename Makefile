@@ -71,6 +71,11 @@ cluster.multi-ssh:
 # 	@ $(BASH_CMD) scripts/cluster/setup-bashrc.sh
 # 	@ $(BASH_CMD) scripts/cluster/verify.sh
 
+##
+## KUBERNETES TARGETS
+##   k8s.make-local-pvs Create Local PersistenVolumes for use in the cluster.
+k8s.make-local-pvs:
+	@ scripts/kubernetes/local-pv-create.sh
 
 ##
 ## ROOK TARGETS
