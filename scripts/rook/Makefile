@@ -142,8 +142,7 @@ rook.install: .rook.config-branch-file
 
 ##   rook.install.pvc   Install Rook on PVCs.
 rook.install.pvc:
-	@ if ! kubectl get persistentvolumes --output name | grep "persistentvolume/local-" >/dev/null; then \
-	    $(MAKE) k8s.make-local-pvs; fi
+	@ $(MAKE) k8s.make-local-pvs
 	@ ROOK_CLUSTER_FILE=$(PWD)/scripts/rook/cluster-on-pvc-test.yaml $(MAKE) rook.install
 
 ##   rook.install.fs    Install filesystem (fs).

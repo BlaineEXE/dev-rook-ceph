@@ -12,17 +12,60 @@ script="$2"
 ANSIBLE="${ANSIBLE:-ansible}" # might be 'ansible -v' from Makefile, for example
 BASH_CMD="${BASH_CMD:-bash}" # might be 'bash -x' from Makefile, for example
 
+cat <<EOF > /tmp/playbook.yaml
+- hosts: ${group}
+  gather_facts: no
+  tasks:
+EOF
+
 # because ssh runs as 'vagrant' user by default, use '--become' to become the root user
 if [[ -f "${script}" ]]; then
-  # if xtrace is set, insert 'set -x' on the second line of the script before copying it
-  if [[ "${BASH_CMD}" == *"-x"* ]]; then
-    sed '1a\
-set -x
-' "${script}" > /tmp/script
-    script="/tmp/script"
-    # cat /tmp/script
-  fi
-  ${ANSIBLE} "${group}" --become -m script -a "${script}"
+  script="${PWD}/${script}"
+  # ${ANSIBLE} "${group}" --become -m script -a "${script}"
+  cat <<EOF >> /tmp/playbook.yaml
+  - copy:
+      src: "${script}"
+      dest: /tmp/script.sh
+    become: true
+  - shell: ${BASH_CMD} /tmp/script.sh
+    become: true
+    register: result
+EOF
 else
-  ${ANSIBLE} "${group}" --become -m shell -a "${BASH_CMD} -c '$script'"
+  # ${ANSIBLE} "${group}" --become -m shell -a "${BASH_CMD} -c '$script'"
+  cat <<EOF >> /tmp/playbook.yaml
+  - shell: ${BASH_CMD} -c '${script}'
+EOF
 fi
+
+cat <<EOF >> /tmp/playbook.yaml
+  # echo the stdout from all hosts serially to prevent interleaving
+  # trim whitespace to prevent randomly added newlines
+  - local_action: |
+        shell echo "{{- ansible_play_hosts
+                      | map('extract', hostvars, 'result')
+                      | map(attribute='stdout')
+                      | map('trim')
+                      | join('\n') -}}" >> /tmp/output
+    run_once: yes
+EOF
+
+if [[ -n "${DEBUG:-}" ]]; then
+  echo '  - debug: msg={{ result }}' >> /tmp/playbook.yaml
+  cat /tmp/playbook.yaml
+fi
+
+rm -rf /tmp/output
+${ANSIBLE_PLAYBOOK} /tmp/playbook.yaml
+
+echo ""
+echo "Collated STDOUT of the command(s) is in /tmp/output"
+echo ""
+
+if [[ -n "${DEBUG:-}" ]]; then
+  cat /tmp/output
+fi
+
+# using this local_action does the echo in parallel and prints interleaved output (NOT GOOD)
+# - local_action: shell echo "{{ item }}" >> /tmp/output
+#   with_items: "{{ result.stdout }}"

@@ -20,6 +20,7 @@ export
 
 
 export ANSIBLE ?= ansible
+export ANSIBLE_PLAYBOOK ?= ansible-playbook
 export BASH_CMD ?= bash
 export PYTHON ?= python3
 export GO ?= $(GO_TOOL)

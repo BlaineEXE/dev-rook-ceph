@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -eEuo pipefail
 
-local_pv_manifest_file="/root/local-pvs.yaml"
-
 function render_local_pv() {
   local disk_name="$1"
   local disk_path="$2"
@@ -37,8 +35,6 @@ spec:
 EOF
 }
 
-rm -f "${local_pv_manifest_file}"
-
 hostname="$(hostname --short)"
 
 # --nodeps won't print partitions or LVM info
@@ -52,15 +48,13 @@ echo "${disks}" | while read -ra line; do
   # only the boot disk should have PTUUID.
 
   if [[ "${type}" != "disk" ]]; then
-    echo "not creating Local PersistentVolume for device ${name} that is not a disk"
+    >&2 echo "not creating Local PersistentVolume for device ${name} that is not a disk"
   fi
   if [[ "${#line[@]}" -gt 4 ]]; then
-    echo "not creating Local PersistentVolume for disk ${name} with a partition"
+    >&2 echo "not creating Local PersistentVolume for disk ${name} with a partition"
     continue
   fi
 
-  echo "creating Local PersistentVolume manifest for disk ${name}"
-  render_local_pv "${name}" "${path}" "${size_bytes}" "${hostname}" >> "${local_pv_manifest_file}"
+  >&2 echo "creating Local PersistentVolume manifest for disk ${name}"
+  render_local_pv "${name}" "${path}" "${size_bytes}" "${hostname}"
 done
-
-kubectl apply -f "${local_pv_manifest_file}"
