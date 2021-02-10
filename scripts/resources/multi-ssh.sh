@@ -35,6 +35,8 @@ else
   # ${ANSIBLE} "${group}" --become -m shell -a "${BASH_CMD} -c '$script'"
   cat <<EOF >> /tmp/playbook.yaml
   - shell: ${BASH_CMD} -c '${script}'
+    become: true
+    register: result
 EOF
 fi
 
