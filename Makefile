@@ -73,6 +73,9 @@ cluster.multi-ssh:
 
 ##
 ## KUBERNETES TARGETS
+##   k8s.set-context    Set the kubectl context to the dev cluster.
+k8s.set-context: .kvmn.kubectl-use-context
+
 ##   k8s.make-local-pvs Create Local PersistenVolumes for use in the cluster.
 k8s.make-local-pvs:
 	@ scripts/kubernetes/local-pv-create.sh
