@@ -11,9 +11,9 @@ trap 'exit $?' ERR
 #
 
 function get_operator_pod () {
-  kubectl --namespace "${ROOK_SYSTEM_NAMESPACE}" get pods \
-          --selector app=rook-ceph-operator \
-          --output custom-columns=name:metadata.name --no-headers
+  # grep 'Running' to easily avoid 'Terminating' bucket after forced operator restart
+  kubectl --namespace "${ROOK_SYSTEM_NAMESPACE}" get pods --no-headers \
+          --selector app=rook-ceph-operator | grep Running | awk '{print $1}'
 }
 export -f get_operator_pod
 
