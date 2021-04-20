@@ -23,7 +23,7 @@ echo 'INSTALLING ROOK-CEPH'
   kubectl apply -f "${ROOK_CLUSTER_FILE}" -f toolbox.yaml
 
   sleep 3
-  kubectl apply -f csi/rbd/storageclass.yaml
+  kubectl apply -f "${ROOK_BLOCK_FILE}"
 )
 
 # Wait for all osd prepare pods to be completed
