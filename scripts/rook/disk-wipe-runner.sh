@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+# remove encryped LVM devices
+# remove dm devices twice; first pass removes sub-devices
+dms="$(dmsetup ls | awk '{print $1}')"
+for dm in $dms; do
+  dmsetup remove "$dm" || true
+done
+dms="$(dmsetup ls | awk '{print $1}')"
+for dm in $dms; do
+  dmsetup remove "$dm" || true
+done
+
 vgimport -a || true
 # list all vgs
 for vg in $(vgs --noheadings --readonly --separator=' ' -o vg_name); do
