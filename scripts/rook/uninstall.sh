@@ -13,8 +13,12 @@ echo 'DELETING ROOK RESOURCES'
 # next install may then detect a delete event at the end and then remove the cluster we want to test
 cluster="$(kubectl --namespace ${ROOK_NAMESPACE} get CephCluster --output name)"
 kubectl --namespace ${ROOK_NAMESPACE} delete "${cluster}" --wait=false
+
+wait_for "CephCluster to start Terminating pods" 25 \
+  "kubectl --namespace ${ROOK_NAMESPACE} get pod --no-headers | grep -q rook-ceph-mgr | grep Terminating"
+
 # Wait for cluster pods to be done running; mgr is one of last to be deleted usually
-wait_for "Rook resources to be deleted" 210 \
+wait_for "Rook resources to be deleted" 200 \
   "! kubectl --namespace ${ROOK_NAMESPACE} get pod --no-headers | grep -q rook-ceph-mgr"
 
 # NEXT go through all the yaml files and do deletes on them to catch any other stuff

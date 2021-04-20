@@ -38,6 +38,7 @@ cluster.build: .kvmn.up
 	@ $(BASH_CMD) scripts/kubernetes/untaint-master.sh
 	@ $(BASH_CMD) scripts/kubernetes/wait-for-up.sh
 	@ $(BASH_CMD) scripts/kubernetes/verify.sh
+	@ $(MAKE) cluster.setup
 
 ##   cluster.pause      Pause the previously-built developmet cluster.
 cluster.pause: .kvmn.stop
@@ -50,9 +51,9 @@ cluster.destroy: .kvmn.clean .kvmn.clean-data .kvmn.clean-force
 	@ rm -rf $(CLUSTER_DATA)
 	@ $(MAKE) .rook.destroy-hook
 
-##   cluster.push-image Push a local image ${ENV}IMG${NON} to the dev cluster ${ENV}TAG${NON}
+##   cluster.push-image Push a local image ${ENV}IMG${NON} to the dev cluster's registry as ${ENV}TAG${NON}.
 cluster.push-image:
-	@	$(BASH_CMD) scripts/resources/push-image.sh "$(IMG)" "$(TAG)"
+	@ $(BASH_CMD) scripts/cluster/push-image.sh "$(IMG)" "$(TAG)"
 
 ##   cluster.ssh        SSH to the cluster master node as root.
 cluster.ssh:
@@ -63,8 +64,9 @@ GROUP ?= all
 cluster.multi-ssh:
 	@ $(MULTI_SSH) "$(GROUP)" "$(CMD)"
 
-# ##   cluster.setup      Set up the cluster's basic user tooling
-# cluster.setup:
+##   cluster.setup      Set up the cluster's basic user tooling like the remote registry.
+cluster.setup:
+	@ kubectl apply -f scripts/cluster/container-registry.yaml
 # 	@ $(BASH_CMD) -c "chmod 600 scripts/resources/.ssh/id_rsa"
 # 	@ $(BASH_CMD) scripts/cluster/wait-for-up.sh
 # 	@ $(BASH_CMD) scripts/cluster/exercise-ssh.sh

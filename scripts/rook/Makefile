@@ -74,7 +74,6 @@ $(CURRENT_BUILT_BRANCH_FILE):
 .rook.print-built-branch:
 	@ echo "  CURRENT BUILT BRANCH: $$(cat $(CURRENT_BUILT_BRANCH_FILE) 2> /dev/null)"
 .rook.build.push:
-	@ # Rook integration tests assume the image under test is "rook/ceph:master"
 	@ $(MAKE) cluster.push-image IMG="rook-build/ceph-$(GOARCH)" TAG="rook/ceph:master"
 	@ git -C rook/ rev-parse --abbrev-ref HEAD > $(CURRENT_BUILT_BRANCH_FILE) # store branch
 .rook.build.showinfo:

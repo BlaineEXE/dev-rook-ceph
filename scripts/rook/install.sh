@@ -14,10 +14,16 @@ echo 'INSTALLING ROOK-CEPH'
     kubectl apply -f crds.yaml
   fi
   kubectl apply -f common.yaml
-  kubectl apply -f operator.yaml
+
+  # apply a modified operator.yaml
+  # set debug log level
+  # change rook/ceph:master image to use local registry's copy of image
+  sed -e 's|value: "INFO"|value: "DEBUG"|' \
+      -e 's|rook/ceph:master|localhost:5000/rook/ceph:master|' operator.yaml | kubectl apply -f -
+  # kubectl apply -f operator.yaml
 
   # Set the Rook log level to Debug after creating the operator deployment for our development
-  kubectl --namespace "${ROOK_NAMESPACE}" set env deployment/rook-ceph-operator ROOK_LOG_LEVEL=DEBUG
+  # kubectl --namespace "${ROOK_NAMESPACE}" set env deployment/rook-ceph-operator ROOK_LOG_LEVEL=DEBUG
 
   sleep 10 # I think it takes a while for the CRDs to create. Workaround by sleeping a few seconds.
   kubectl apply -f "${ROOK_CLUSTER_FILE}" -f toolbox.yaml
@@ -37,4 +43,8 @@ cat <<EOF
 CEPH STATUS:
 
 EOF
-exec_in_toolbox_pod ceph -s
+# try multiple times in case first time errors
+time while ! exec_in_toolbox_pod ceph -s; do
+  echo "Trying again... :|"
+  sleep 5
+done
