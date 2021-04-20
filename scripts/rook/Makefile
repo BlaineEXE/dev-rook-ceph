@@ -39,6 +39,8 @@ ROOK_FILESYSTEM_FILE ?= filesystem.yaml
 ROOK_OBJECT_FILE ?= object.yaml
 ROOK_NFS_FILE ?= nfs.yaml
 
+ROOK_OBJECT_USER_FILE ?= object-user.yaml
+
 # ensure the rook repo is cloned to this project
 .rook.repo: $(GO_TOOL)
 	@ $(BASH_CMD) -c 'if ! git -C $(ROOK_REPO_DIR) status >/dev/null; then \
@@ -149,11 +151,12 @@ rook.install.pvc:
 
 ##   rook.install.fs    Install filesystem (fs).
 rook.install.fs: .rook.config-branch-file
-	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/${ROOK_FILESYSTEM_FILE}"
+	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/$(ROOK_FILESYSTEM_FILE)"
 
 ##   rook.install.obj   Install object store.
 rook.install.obj: .rook.config-branch-file
-	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/${ROOK_OBJECT_FILE}"
+	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/$(ROOK_OBJECT_FILE)"
+	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/$(ROOK_OBJECT_USER_FILE)"
 
 ##   rook.install.obc   Install object bucket claim (OBC). Implies ${TGT}rook.install.obj${NON}.
 rook.install.obc: .rook.config-branch-file rook.install.obj
@@ -163,7 +166,7 @@ rook.install.obc: .rook.config-branch-file rook.install.obj
 ##   rook.install.nfs   Install NFS. Implies ${TGT}rook.install.fs${NON}.
 rook.install.nfs: rook.install.fs
 	@ cd $(ROOK_CONFIG_DIR)/ceph && \
-	  if [[ -f "${ROOK_NFS_FILE}" ]]; then kubectl apply -f "${ROOK_NFS_FILE}" ; \
+	  if [[ -f "$(ROOK_NFS_FILE)" ]]; then kubectl apply -f "$(ROOK_NFS_FILE)" ; \
 	  else kubectl apply -f nfs.yaml; fi # nfs-test.yaml introduced in rook v1.5
 
 ##   rook.install.stg   Install all storage types - filesystem, object store, OBC, and NFS.
