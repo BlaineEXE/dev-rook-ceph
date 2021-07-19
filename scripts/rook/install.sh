@@ -16,9 +16,10 @@ echo 'INSTALLING ROOK-CEPH'
   kubectl apply -f common.yaml
 
   # apply a modified operator.yaml
-  # set debug log level
+  # set debug log level (in env var or configmap)
   # change rook/ceph:master image to use local registry's copy of image
   sed -e 's|value: "INFO"|value: "DEBUG"|' \
+      -e 's|ROOK_LOG_LEVEL: "INFO"|ROOK_LOG_LEVEL: "DEBUG"|' \
       -e 's|rook/ceph:master|localhost:5000/rook/ceph:master|' operator.yaml | kubectl apply -f -
   # kubectl apply -f operator.yaml
 
