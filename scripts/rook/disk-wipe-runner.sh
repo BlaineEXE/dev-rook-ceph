@@ -24,18 +24,23 @@ for pv in $(pvs --noheadings --readonly --separator=' ' -o pv_name); do
 done
 
 # the boot disk isn't always sda or vda, and we CANNOT wipe the boot disk
+# if there are partitions, we want to wipe those first
 boot_disk="$(fdisk --list | \
   grep --extended-regexp '(boot|/dev/.*\*)' | \
   grep --only-matching --extended-regexp '/dev/[vs]d[a-z]+')"
-rook_disks="$(find /dev -regex '/dev/[vs]d[a-z]+$' -and -not -wholename "${boot_disk}")"
+lsblk_cmd='lsblk --noheadings --paths --output KNAME'
+# lsblk --nodeps gives only disks, --inverse with --nodeps gives only partitions
+rook_partitions="$(${lsblk_cmd} --inverse --nodeps | grep --extended-regexp '/dev/[vs]d[a-z]+' | grep --invert-match "${boot_disk}")"
+rook_disks="$(${lsblk_cmd} --nodeps | grep --extended-regexp '/dev/[vs]d[a-z]+' | grep --invert-match "${boot_disk}")"
+rook_devices="${rook_partitions} ${rook_disks}"
 
-# zap the disks to a fresh, usable state after LVM info is delted
+# zap the device to a fresh, usable state after LVM info is delted
 # (zap-all is important, b/c MBR has to be clean)
-for disk in ${rook_disks}; do
-  wipefs --all "${disk}"
+for device in ${rook_devices}; do
+  wipefs --all "${device}"
   # lvm metadata can be a lot of sectors
-  dd if=/dev/zero of="${disk}" bs=512 count=10000
-  # sgdisk --zap-all "${disk}"
+  dd if=/dev/zero of="${device}" bs=512 count=10000
+  # sgdisk --zap-all "${device}"
 done
 
 # some devices might still be mapped that lock the disks
