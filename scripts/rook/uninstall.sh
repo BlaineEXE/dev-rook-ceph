@@ -50,8 +50,10 @@ wait_for "Rook resources to be deleted" 210 \
 
 # Sometimes the ceph cluster CRD gets stuck in a state where it can't be deleted
 kubectl patch crd/cephclusters.ceph.rook.io -p '{"metadata":{"finalizers":[]}}' --type=merge
+kubectl patch crd/cephblockpools.ceph.rook.io -p '{"metadata":{"finalizers":[]}}' --type=merge
 sleep 3
 kubectl delete crd/cephclusters.ceph.rook.io --wait=false
+kubectl delete crd/cephblockpools.ceph.rook.io --wait=false
 
 wait_for "Rook namespaces to be deleted" 210 \
   "! kubectl get namespaces | grep -q -e '${ROOK_SYSTEM_NAMESPACE}' -e '${ROOK_NAMESPACE}'"
