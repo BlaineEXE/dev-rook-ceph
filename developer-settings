@@ -7,13 +7,10 @@ source "${SCRIPT_DIR}/_default-dev-settings"
 # Add your own overrides to the default-dev-settings here
 # examples:
 
-# export NODE_COUNT=2
-
-# export MASTER_CPUS=2
-# export MASTER_MEMORY_SIZE_GB=2
+# export NODE_COUNT=3
 
 # export NODE_CPUS=2
-# export NODE_MEMORY_SIZE_GB=2
+# export NODE_MEMORY_GB=4
 
-# export DISK_COUNT=2
-# export DISK_SIZE_GB=10
+# export NODE_DISK_COUNT=1
+# export NODE_DISK_SIZE_GB=20

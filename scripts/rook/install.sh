@@ -34,7 +34,7 @@ echo 'INSTALLING ROOK-CEPH'
 )
 
 # Wait for all osd prepare pods to be completed
-num_osd_nodes=$(( NODE_COUNT + 1 ))
+num_osd_nodes=$(( NODE_COUNT ))
 wait_for "Ceph to be installed" "${INSTALL_TIMEOUT}" \
   "[[ \$(kubectl get --namespace '${ROOK_NAMESPACE}' pods 2>&1 | grep -c 'rook-ceph-osd-prepare.*Completed') -eq $num_osd_nodes ]]"
 

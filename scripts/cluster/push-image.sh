@@ -26,6 +26,7 @@ $DOCKER push "0.0.0.0:5000/${remote_image}"
 
 # Pull the image on all nodes
 # images are read from the registry as localhost:5000 (not 0.0.0.0:5000)
+echo "Pulling image to all nodes"
 suppress_output_unless_error "${MULTI_SSH} all 'docker pull localhost:5000/${remote_image}'"
 
 # Tag the image on all nodes as the desired remote image

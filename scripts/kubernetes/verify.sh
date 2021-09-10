@@ -5,9 +5,8 @@ echo -n "Verifying basic Kubernetes cluster operations ... "
 # assert that kubectl get nodes returns the expected number of masters+workers
 node_count=$(kubectl get nodes --no-headers | wc -l)
 node_count=${node_count%$'\r'} # node count comes back with \r on the end
-expected_count=$((NODE_COUNT + 1))
-if [[ $node_count -ne $expected_count ]]; then
-  echo "  ERROR! Expected count (${expected_count}) does not match the actual node count (${node_count})!"
+if [[ $node_count -ne ${NODE_COUNT} ]]; then
+  echo "  ERROR! Expected count (${NODE_COUNT}) does not match the actual node count (${node_count})!"
   exit 1
 fi
 

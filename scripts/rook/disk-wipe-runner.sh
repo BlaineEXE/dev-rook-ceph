@@ -23,21 +23,27 @@ for pv in $(pvs --noheadings --readonly --separator=' ' -o pv_name); do
   pvremove --yes --force "$pv"
 done
 
-# the boot disk isn't always sda or vda, and we CANNOT wipe the boot disk
-# if there are partitions, we want to wipe those first
-boot_disk="$(fdisk --list | \
-  grep --extended-regexp '(boot|/dev/.*\*)' | \
-  grep --only-matching --extended-regexp '/dev/[vs]d[a-z]+')"
+if [[ "$(hostname)" == minikube* ]]; then
+  # on minikube, boot disk is reliably vda or sda
+  boot_disk="$(lsblk --output KNAME | grep -E '[sv]da$')"
+else
+  # the boot disk isn't always sda or vda, and we CANNOT wipe the boot disk
+  # if there are partitions, we want to wipe those first
+  # grep flags: -o == --only-matching, -E == --extended-regexp, -v == --invert-match
+  boot_disk="$(fdisk --list | \
+    grep -E '(boot|/dev/.*\*)' | \
+    grep -o -E '/dev/[vs]d[a-z]+')"
+fi
 lsblk_cmd='lsblk --noheadings --paths --output KNAME'
 # lsblk --nodeps gives only disks, --inverse with --nodeps gives only partitions
-rook_partitions="$(${lsblk_cmd} --inverse --nodeps | grep --extended-regexp '/dev/[vs]d[a-z]+' | grep --invert-match "${boot_disk}")"
-rook_disks="$(${lsblk_cmd} --nodeps | grep --extended-regexp '/dev/[vs]d[a-z]+' | grep --invert-match "${boot_disk}")"
+rook_partitions="$(${lsblk_cmd} --inverse --nodeps | grep -E '/dev/[vs]d[a-z]+' | grep -v "${boot_disk}")"
+rook_disks="$(${lsblk_cmd} --nodeps | grep -E '/dev/[vs]d[a-z]+' | grep -v "${boot_disk}")"
 rook_devices="${rook_partitions} ${rook_disks}"
 
 # zap the device to a fresh, usable state after LVM info is delted
 # (zap-all is important, b/c MBR has to be clean)
 for device in ${rook_devices}; do
-  wipefs --all "${device}"
+  # wipefs --all "${device}" # not avail on minikube
   # lvm metadata can be a lot of sectors
   dd if=/dev/zero of="${device}" bs=512 count=10000
   # sgdisk --zap-all "${device}"

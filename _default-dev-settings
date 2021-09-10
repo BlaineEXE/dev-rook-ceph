@@ -1,15 +1,9 @@
 #!/usr/bin/env bash
 
-#--------------------------------------------------------------------------------------------------#
-# Cluster settings
-#   dev-rook-ceph uses https://github.com/galexrt/k8s-vagrant-multi-node to stand up Kubernetes
-#   clusters. Refer to those docs for more settings that can be used to configure the cluster.
-#--------------------------------------------------------------------------------------------------#
+export NODE_COUNT=1
 
-export NODE_COUNT=0
+export NODE_CPUS=5
+export NODE_MEMORY_GB=10
 
-export MASTER_CPUS=4
-export MASTER_MEMORY_SIZE_GB=4
-
-export DISK_COUNT=3
-export DISK_SIZE_GB=10
+export NODE_DISK_COUNT=3
+# export NODE_DISK_SIZE_GB=20

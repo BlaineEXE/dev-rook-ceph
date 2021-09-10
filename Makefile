@@ -17,37 +17,22 @@ $(shell git update-index --assume-unchanged developer-settings)
 
 ##
 ## CLUSTER TARGETS
-K8S_VAGRANT_DIR ?= $(PWD)/k8s-vagrant-multi-node
-CLUSTER_DATA ?= $(PWD)/.cluster
+export CLUSTER_DATA ?= $(PWD)/.cluster
 export NODE_LIST_FILE := $(CLUSTER_DATA)/node-list
 export ANSIBLE_CONFIG ?= $(CLUSTER_DATA)/ansible.cfg
 
-# kvmn = k8s-vagrant-multi-node
-# make with --jobs option hangs standing up nodes in parallel?
-.kvmn.%:
-	@ mkdir -p $(CLUSTER_DATA)
-	@ $(BASH_CMD) -c 'if ! git -C $(K8S_VAGRANT_DIR) status >/dev/null; then \
-	    echo "  ERROR! k8s-vagrant-multi-node repo is not cloned to K8S_VAGRANT_DIR=$(K8S_VAGRANT_DIR); cannot continue!"; exit 1; fi'
-	@ $(MAKE) --directory=$(K8S_VAGRANT_DIR) $*
-
 ##   cluster.build      Stand up a cluster for development with params defined in ${FIL}developer-settings${NON}
-cluster.build: .kvmn.up
-	@ $(MAKE) .kvmn.ssh-config > $(CLUSTER_DATA)/ssh_config
-	@ sed -n -e 's/^Host //p' $(CLUSTER_DATA)/ssh_config > $(NODE_LIST_FILE)
+cluster.build:
+	@ $(BASH_CMD) scripts/cluster/minikube.sh
 	@ $(BASH_CMD) scripts/cluster/generate-ansible-cfg.sh > $(ANSIBLE_CONFIG)
 	@ $(BASH_CMD) scripts/kubernetes/untaint-master.sh
 	@ $(BASH_CMD) scripts/kubernetes/wait-for-up.sh
 	@ $(BASH_CMD) scripts/kubernetes/verify.sh
-	@ $(MAKE) cluster.setup
-
-##   cluster.pause      Pause the previously-built developmet cluster.
-cluster.pause: .kvmn.stop
-
-##   cluster.unpause    Un-pause the previously-built development cluster.
-cluster.unpause: .kvmn.up
+	@ kubectl apply -f scripts/cluster/container-registry.yaml
 
 ##   cluster.destroy    Destroy the previously-built development cluster
-cluster.destroy: .kvmn.clean .kvmn.clean-data .kvmn.clean-force
+cluster.destroy:
+	@ $(MINIKUBE) delete
 	@ rm -rf $(CLUSTER_DATA)
 	@ $(MAKE) .rook.destroy-hook
 
@@ -57,26 +42,18 @@ cluster.push-image:
 
 ##   cluster.ssh        SSH to the cluster master node as root.
 cluster.ssh:
-	@ ssh -F $(CLUSTER_DATA)/ssh_config -t master "sudo su -"
+	@ $(MINIKUBE) ssh
 
 ##   cluster.multi-ssh  Send SSH command ${ENV}CMD${NON} to node group ${ENV}GROUP${NON} (default ${ENV}GROUP=all${NON}).
 GROUP ?= all
 cluster.multi-ssh:
 	@ $(MULTI_SSH) "$(GROUP)" "$(CMD)"
 
-##   cluster.setup      Set up the cluster's basic user tooling like the remote registry.
-cluster.setup:
-	@ kubectl apply -f scripts/cluster/container-registry.yaml
-# 	@ $(BASH_CMD) -c "chmod 600 scripts/resources/.ssh/id_rsa"
-# 	@ $(BASH_CMD) scripts/cluster/wait-for-up.sh
-# 	@ $(BASH_CMD) scripts/cluster/exercise-ssh.sh
-# 	@ $(BASH_CMD) scripts/cluster/setup-bashrc.sh
-# 	@ $(BASH_CMD) scripts/cluster/verify.sh
-
 ##
 ## KUBERNETES TARGETS
-##   k8s.set-context    Set the kubectl context to the dev cluster.
-k8s.set-context: .kvmn.kubectl-use-context
+# ##   k8s.set-context    Set the kubectl context to the dev cluster.
+# k8s.set-context:
+# 	@ minikube update-context
 
 ##   k8s.make-local-pvs Create Local PersistenVolumes for use in the cluster.
 k8s.make-local-pvs:

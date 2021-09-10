@@ -25,6 +25,7 @@ export BASH_CMD ?= bash
 export PYTHON ?= python3
 export GO ?= $(GO_TOOL)
 export DOCKER ?= docker
+export MINIKUBE ?= minikube
 
 
 ifdef DEBUG
