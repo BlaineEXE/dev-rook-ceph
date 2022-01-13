@@ -8,7 +8,7 @@ INSTALL_TIMEOUT=${INSTALL_TIMEOUT:-900}
 echo ''
 echo 'INSTALLING ROOK-CEPH'
 
-( cd "${ROOK_CONFIG_DIR}"/ceph
+( cd "${ROOK_CONFIG_DIR}"
   if [[ -s crds.yaml ]]; then
     # crds.yaml was added for Rook v1.5
     kubectl apply -f crds.yaml
@@ -20,7 +20,7 @@ echo 'INSTALLING ROOK-CEPH'
   # change rook/ceph:master image to use local registry's copy of image
   sed -e 's|value: "INFO"|value: "DEBUG"|' \
       -e 's|ROOK_LOG_LEVEL: "INFO"|ROOK_LOG_LEVEL: "DEBUG"|' \
-      -e 's|rook/ceph:master|localhost:5000/rook/ceph:master|' operator.yaml | kubectl apply -f -
+      -e 's|rook/ceph:master|rook/ceph:local-build|' operator.yaml | kubectl apply -f -
   # kubectl apply -f operator.yaml
 
   # Set the Rook log level to Debug after creating the operator deployment for our development

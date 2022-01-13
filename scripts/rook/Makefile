@@ -5,7 +5,7 @@
 ## BASIC WORKFLOW
 ##  This environment makes it possible to keep separate branches for config changes and code changes:
 ##    * 'config' branches with modified manifest files used for installing Rook with different
-##      configurations. Rook manifests exist in ${DIR}rook/cluster/examples/kubernetes/ceph/${NON}.
+##      configurations. Rook manifests exist in ${DIR}rook/deploy/examples${NON}.
 ##    * 'working' branches with code changes separate from any manifest file changes.
 ##
 ##  Using this pattern, a good dev workflow for Rook code is:
@@ -59,7 +59,8 @@ ROOK_OBJECT_USER_FILE ?= object-user.yaml
 rook.build: .rook.repo
 	@ $(MAKE) .rook.build.startmsg
 	@ $(MAKE) .rook.make.build
-	@ $(MAKE) .rook.build.push
+	@ docker tag rook-build/ceph-$(GOARCH) rook/ceph:local-build
+	@ # $(MAKE) .rook.build.push # don't push now that we use minikube's docker context
 	@ $(MAKE) .rook.build.showinfo
 rook.build.nopush: .rook.repo
 	@ $(MAKE) .rook.build.startmsg
@@ -114,7 +115,11 @@ rook.integration?:
 .rook.copy-config: .rook.repo rook.unset-config
 # only copy the configs, don't store the branch
 	@ mkdir -p $(ROOK_CONFIG_DIR)
-	@ cp -a rook/cluster/examples/kubernetes/* $(ROOK_CONFIG_DIR)/.
+# manifests dir changed from cluster/examples/kubernetes/ceph to deploy/examples in Rook v1.8
+	@ if [[ -d rook/cluster/examples/kubernetes/ceph ]]; then \
+	       cp -a rook/cluster/examples/kubernetes/ceph/* $(ROOK_CONFIG_DIR)/. ; \
+	  else cp -a rook/deploy/examples/* $(ROOK_CONFIG_DIR)/. ; fi
+
 .rook.set-config: .rook.copy-config
 # copy configs AND store the branch
 # same as 'rook.set-config' but won't print 'rook.showinfo' afterwards; used by upgrade makefile
@@ -150,23 +155,21 @@ rook.install.pvc:
 
 ##   rook.install.fs    Install filesystem (fs).
 rook.install.fs: .rook.config-branch-file
-	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/$(ROOK_FILESYSTEM_FILE)"
+	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/$(ROOK_FILESYSTEM_FILE)"
 
 ##   rook.install.obj   Install object store.
 rook.install.obj: .rook.config-branch-file
-	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/$(ROOK_OBJECT_FILE)"
-	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/$(ROOK_OBJECT_USER_FILE)"
+	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/$(ROOK_OBJECT_FILE)"
+	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/$(ROOK_OBJECT_USER_FILE)"
 
 ##   rook.install.obc   Install object bucket claim (OBC). Implies ${TGT}rook.install.obj${NON}.
 rook.install.obc: .rook.config-branch-file rook.install.obj
-	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/ceph/storageclass-bucket-delete.yaml" \
-	                -f "$(ROOK_CONFIG_DIR)/ceph/object-bucket-claim-delete.yaml"
+	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/storageclass-bucket-delete.yaml" \
+	                -f "$(ROOK_CONFIG_DIR)/object-bucket-claim-delete.yaml"
 
 ##   rook.install.nfs   Install NFS. Implies ${TGT}rook.install.fs${NON}.
 rook.install.nfs: rook.install.fs
-	@ cd $(ROOK_CONFIG_DIR)/ceph && \
-	  if [[ -f "$(ROOK_NFS_FILE)" ]]; then kubectl apply -f "$(ROOK_NFS_FILE)" ; \
-	  else kubectl apply -f nfs.yaml; fi # nfs-test.yaml introduced in rook v1.5
+	@ kubectl apply -f "$(ROOK_CONFIG_DIR)/nfs-test.yaml"
 
 ##   rook.install.stg   Install all storage types - filesystem, object store, OBC, and NFS.
 rook.install.stg: rook.install.obc rook.install.nfs
@@ -175,7 +178,7 @@ rook.install.stg: rook.install.obc rook.install.nfs
 ##                          config files. Run this target before copying new configs.
 rook.uninstall: .rook.config-branch-file
 	@ $(BASH_CMD) scripts/rook/uninstall.sh
-	@ sleep 10  # I think k8s needs time to flush the info from etcd
+	@ # sleep 10  # I think k8s needs time to flush the info from etcd
 	@ $(MAKE) rook.showinfo
 	@ $(BASH_CMD) scripts/resources/success-message.sh "ROOK UN-INSTALLED"
 

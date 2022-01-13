@@ -10,14 +10,14 @@ if [[ -s "${UPGRADE_TO_CONFIG_BRANCH_FILE}" ]]; then
 fi
 echo "Upgrading Rook from config in branch '${from_branch}' to config in ${to_branch} ... "
 
-find ${UPGRADE_TO_CONFIG_DIR}/ceph/ -name 'crds.yaml' -exec kubectl apply -f {} \;
-find ${UPGRADE_TO_CONFIG_DIR}/ceph/ -name 'upgrade-*-crd*.yaml' -exec kubectl apply -f {} \;
-find ${UPGRADE_TO_CONFIG_DIR}/ceph/ -name 'upgrade-*-create.yaml' -exec kubectl create -f {} \;
-find ${UPGRADE_TO_CONFIG_DIR}/ceph/ -name 'upgrade-*-apply.yaml' -exec kubectl apply -f {} \;
+find ${UPGRADE_TO_CONFIG_DIR}/ -name 'crds.yaml' -exec kubectl apply -f {} \;
+find ${UPGRADE_TO_CONFIG_DIR}/ -name 'upgrade-*-crd*.yaml' -exec kubectl apply -f {} \;
+find ${UPGRADE_TO_CONFIG_DIR}/ -name 'upgrade-*-create.yaml' -exec kubectl create -f {} \;
+find ${UPGRADE_TO_CONFIG_DIR}/ -name 'upgrade-*-apply.yaml' -exec kubectl apply -f {} \;
 
 kubectl --namespace "${ROOK_SYSTEM_NAMESPACE}" set image deploy/rook-ceph-operator \
   rook-ceph-operator=rook/ceph:master
 
-find ${UPGRADE_TO_CONFIG_DIR}/ceph/ -name 'upgrade-*-delete.yaml' -exec kubectl delete -f {} \;
+find ${UPGRADE_TO_CONFIG_DIR}/ -name 'upgrade-*-delete.yaml' -exec kubectl delete -f {} \;
 
 echo "  ... done. The upgrade is commencing."

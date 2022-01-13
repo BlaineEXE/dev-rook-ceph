@@ -32,7 +32,7 @@ cluster.build:
 
 ##   cluster.destroy    Destroy the previously-built development cluster
 cluster.destroy:
-	@ $(MINIKUBE) delete
+	@ $(BASH_CMD) scripts/cluster/minikube-down.sh
 	@ rm -rf $(CLUSTER_DATA)
 	@ $(MAKE) .rook.destroy-hook
 
