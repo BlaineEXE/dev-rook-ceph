@@ -7,3 +7,7 @@ export NODE_MEMORY_GB=10
 
 export NODE_DISK_COUNT=3
 # export NODE_DISK_SIZE_GB=20
+
+# You can control minikube flags with env vars preceded by MINIKUBE_ also
+# export MINIKUBE_CNI=flannel
+# export MINIKUBE_CONTAINER_RUNTIME='cri-o'
