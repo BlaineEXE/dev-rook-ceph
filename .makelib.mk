@@ -24,13 +24,13 @@ export ANSIBLE_PLAYBOOK ?= ansible-playbook
 export BASH_CMD ?= bash
 export PYTHON ?= python3
 export GO ?= $(GO_TOOL)
-export DOCKER ?= docker
+export PODMAN ?= podman
 export MINIKUBE ?= minikube
 
 
 ifdef DEBUG
 export BASH_CMD += -x
-export DOCKER += --debug
+export PODMAN += --log-level=debug
 endif
 
 

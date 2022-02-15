@@ -21,7 +21,7 @@ export CEPH_BINARIES_TO_BUILD ?= ceph-mgr
 
 .ceph.buildcontainer:
 	@ echo "Ensuring ceph-build container. Takes a LONG time at first run, just a second after."
-	@ $(DOCKER) build -t ceph-build scripts/ceph/build-container
+	@ $(PODMAN) build -t ceph-build scripts/ceph/build-container
 
 $(CCACHE_DIR):
 	@ mkdir -p "$(CCACHE_DIR)"
@@ -43,7 +43,7 @@ ceph.build.image: .ceph.repo
 	@ rm -rf $(PYTHON_COPY_DIR) && mkdir -p $(PYTHON_COPY_DIR)
 	@ cp -a ceph/src/python-common $(PYTHON_COPY_DIR)/python-common
 	@ cp -a ceph/src/ceph-volume   $(PYTHON_COPY_DIR)/ceph-volume
-	@ $(DOCKER) build -t ceph/ceph:local scripts/ceph/ceph-container
+	@ $(PODMAN) build -t ceph/ceph:local scripts/ceph/ceph-container
 	@ $(MAKE) cluster.push-image IMG="ceph/ceph:local" TAG="ceph/ceph:local"
 	@ bash scripts/resources/success-message.sh "CEPH IMAGE BUILT AND PUSHED AS ceph/ceph:local"
 

@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 # get etcd container id (must not be a pause container, which is probably a Pod)
-etcd_ps="$(docker ps -a | grep etcd | grep -v pause)"
+etcd_ps="$(PODMAN ps -a | grep etcd | grep -v pause)"
 etcd_ctr_id="${etcd_ps%% *}" # container id is first word in line
 
 cert_dir="/etc/kubernetes/pki" # for kubeadm

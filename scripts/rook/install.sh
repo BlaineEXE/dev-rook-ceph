@@ -5,6 +5,8 @@ source scripts/shared.sh
 
 INSTALL_TIMEOUT=${INSTALL_TIMEOUT:-900}
 
+ROOK_IMAGE="${ROOK_IMAGE:-localhost/rook/ceph:local-build}"
+
 echo ''
 echo 'INSTALLING ROOK-CEPH'
 
@@ -20,7 +22,7 @@ echo 'INSTALLING ROOK-CEPH'
   # change rook/ceph:master image to use local registry's copy of image
   sed -e 's|value: "INFO"|value: "DEBUG"|' \
       -e 's|ROOK_LOG_LEVEL: "INFO"|ROOK_LOG_LEVEL: "DEBUG"|' \
-      -e 's|rook/ceph:master|rook/ceph:local-build|' operator.yaml | kubectl apply -f -
+      -e "s|rook/ceph:master|${ROOK_IMAGE}|" operator.yaml | kubectl apply -f -
   # kubectl apply -f operator.yaml
 
   # Set the Rook log level to Debug after creating the operator deployment for our development

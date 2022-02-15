@@ -2,6 +2,8 @@
 set -eEuo pipefail
 
 : "${MINIKUBE:-"minikube"}"
+: "${PODMAN:-"podman"}"
+
 
 minikube_args=(
   --nodes="${NODE_COUNT}"
@@ -61,14 +63,14 @@ cat <<EOF >> .cluster/node-list
 minikube
 EOF
 
-echo "Setting docker context to minikube..."
-# Set up a 'minikube' docker context, and set up the system to use it
-docker context use default # change to default context
-docker context rm minikube || true # remove minikube context if it already exists
-( # use subshell so the exported minikube docker-env doesn't propagate to parent shell
-  # shellcheck disable=SC2046 # don't quote the eval below
-  eval $($MINIKUBE -p minikube docker-env) # set up default context to use minikube env info
-  docker context export default - | docker context import minikube - # import context as 'minikube'
-)
-docker context use minikube
-echo "  ... done"
+# echo "Setting docker context to minikube..."
+# # Set up a 'minikube' docker context, and set up the system to use it
+# $PODMAN context use default # change to default context
+# $PODMAN context rm minikube || true # remove minikube context if it already exists
+# ( # use subshell so the exported minikube docker-env doesn't propagate to parent shell
+#   # shellcheck disable=SC2046 # don't quote the eval below
+#   eval $($MINIKUBE -p minikube docker-env) # set up default context to use minikube env info
+#   $PODMAN context export default - | $PODMAN context import minikube - # import context as 'minikube'
+# )
+# $PODMAN context use minikube
+# echo "  ... done"

@@ -20,8 +20,8 @@ trap cleanup EXIT
 
 # Push image to registry
 # push to the dev cluster's registry as 0.0.0.0:5000 to work with Docker Desktop on mac
-$DOCKER tag "${local_image}" 0.0.0.0:5000/"${remote_image}"
-$DOCKER push "0.0.0.0:5000/${remote_image}"
+$PODMAN tag "${local_image}" 0.0.0.0:5000/"${remote_image}"
+$PODMAN push "0.0.0.0:5000/${remote_image}"
 # must have 0.0.0.0:5000 set as an insecure registry in docker config
 
 # Pull the image on all nodes

@@ -59,8 +59,8 @@ ROOK_OBJECT_USER_FILE ?= object-user.yaml
 rook.build: .rook.repo
 	@ $(MAKE) .rook.build.startmsg
 	@ $(MAKE) .rook.make.build
-	@ docker tag rook-build/ceph-$(GOARCH) rook/ceph:local-build
-	@ # $(MAKE) .rook.build.push # don't push now that we use minikube's docker context
+	@ $(PODMAN) tag rook-build/ceph-$(GOARCH) rook/ceph:local-build
+	@ $(MAKE) .rook.build.push
 	@ $(MAKE) .rook.build.showinfo
 rook.build.nopush: .rook.repo
 	@ $(MAKE) .rook.build.startmsg
@@ -75,7 +75,10 @@ $(CURRENT_BUILT_BRANCH_FILE):
 .rook.print-built-branch:
 	@ echo "  CURRENT BUILT BRANCH: $$(cat $(CURRENT_BUILT_BRANCH_FILE) 2> /dev/null)"
 .rook.build.push:
-	@ $(MAKE) cluster.push-image IMG="rook-build/ceph-$(GOARCH)" TAG="rook/ceph:master"
+	@ echo '  PUSHING IMAGE rook/ceph:local-build TO MINIKUBE'
+	@ # $(MAKE) cluster.push-image IMG="rook-build/ceph-$(GOARCH)" TAG="rook/ceph:local-build"
+	@ # oci-archive format seems to be a bit faster than the default docker archive format
+	@ $(PODMAN) image save --format=oci-archive rook/ceph:local-build | minikube image load -
 	@ git -C rook/ rev-parse --abbrev-ref HEAD > $(CURRENT_BUILT_BRANCH_FILE) # store branch
 .rook.build.showinfo:
 	@ bash scripts/resources/success-message.sh "ROOK BUILT"
