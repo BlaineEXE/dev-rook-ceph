@@ -44,7 +44,7 @@ trap cleanup EXIT
 # Push image to registry
 echo "    Pushing image to kube's registry"
 $PODMAN tag "${local_image}" localhost:5000/"${remote_image}"
-$PODMAN push "localhost:5000/${remote_image}"
+$PODMAN push --tls-verify=false "localhost:5000/${remote_image}"
 
 # Pull the image on all nodes
 echo "    Pulling image to all nodes"
