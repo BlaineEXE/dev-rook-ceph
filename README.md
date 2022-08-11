@@ -26,7 +26,7 @@ Prerequisites
 ### Known dependencies
  - bash
  - curl
- - docker
+ - podman
  - vagrant
  - vagrant plugin: vagrant-reload
  - virtualbox

@@ -10,7 +10,7 @@ CCACHE_DIR="$(readlink --canonicalize-existing "${CCACHE_DIR}")"
 #   so sudo doesn't complain about uid not having a name
 # insert our local ceph source to build; no need to git pull in the container
 # insert our local ccache dir to speed up repeat builds
-docker run -t --rm --user="$(id -u $USER):$(id -g $USER)" \
+$PODMAN run -t --rm --user="$(id -u $USER):$(id -g $USER)" \
     --volume "/etc/passwd:/etc/passwd:ro" --volume "/etc/group:/etc/group:ro" \
     --volume "${CEPH_DIR}:/src/ceph" \
     --volume "${CCACHE_DIR}:/home/$USER/.ccache" \

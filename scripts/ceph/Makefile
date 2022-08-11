@@ -33,16 +33,19 @@ $(CCACHE_DIR):
 ceph.build: .ceph.repo .ceph.buildcontainer $(CCACHE_DIR)
 	@ $(BASH_CMD) scripts/ceph/build-in-dockerfile.sh
 
-export CEPH_BASE_IMAGE ?= ceph/daemon-base
+export CEPH_BASE_IMAGE ?= quay.io/ceph/daemon-base
 ##   ceph.build.image   Overlay locally-built Ceph files on top of a Ceph base image, and push the
 ##                          image as ${IMG}ceph/ceph:local${NON}.
 ##                          Default base image: ${ENV}CEPH_BASE_IMAGE=${CEPH_BASE_IMAGE}${NON}.
 PYTHON_COPY_DIR ?= scripts/ceph/ceph-container/.python-files
+MGR_MOD_COPY_DIR ?= scripts/ceph/ceph-container/.mgr-mod-files
 ceph.build.image: .ceph.repo
 	@ echo '  BUILDING CEPH IMAGE AS ceph/ceph:local'
 	@ rm -rf $(PYTHON_COPY_DIR) && mkdir -p $(PYTHON_COPY_DIR)
 	@ cp -a ceph/src/python-common $(PYTHON_COPY_DIR)/python-common
 	@ cp -a ceph/src/ceph-volume   $(PYTHON_COPY_DIR)/ceph-volume
+	@ rm -rf $(MGR_MOD_COPY_DIR) && mkdir -p $(MGR_MOD_COPY_DIR)
+	@ cp -a ceph/src/pybind/mgr/*    $(MGR_MOD_COPY_DIR)
 	@ $(PODMAN) build -t ceph/ceph:local scripts/ceph/ceph-container
 	@ $(MAKE) cluster.push-image IMG="ceph/ceph:local" TAG="ceph/ceph:local"
 	@ bash scripts/resources/success-message.sh "CEPH IMAGE BUILT AND PUSHED AS ceph/ceph:local"

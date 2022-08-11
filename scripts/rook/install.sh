@@ -3,9 +3,9 @@ set -Eeuo pipefail
 
 source scripts/shared.sh
 
-INSTALL_TIMEOUT=${INSTALL_TIMEOUT:-900}
+INSTALL_TIMEOUT=${INSTALL_TIMEOUT:=900}
 
-ROOK_IMAGE="${ROOK_IMAGE:-localhost/rook/ceph:local-build}"
+ROOK_IMAGE="${ROOK_IMAGE:=localhost:5000/rook/ceph:local-build}"
 
 echo ''
 echo 'INSTALLING ROOK-CEPH'

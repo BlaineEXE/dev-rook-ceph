@@ -8,9 +8,9 @@ set -u
 group="$1"
 script="$2"
 
-ANSIBLE="${ANSIBLE:-ansible}" # might be 'ansible -v' from Makefile, for example
-BASH_CMD="${BASH_CMD:-bash}" # might be 'bash -x' from Makefile, for example
-CLUSTER_DATA="${CLUSTER_DATA:-"$PWD"/.cluster}"
+ANSIBLE="${ANSIBLE:=ansible}" # might be 'ansible -v' from Makefile, for example
+BASH_CMD="${BASH_CMD:=bash}" # might be 'bash -x' from Makefile, for example
+CLUSTER_DATA="${CLUSTER_DATA:="$PWD"/.cluster}"
 
 cat <<EOF > /tmp/playbook.yaml
 - hosts: ${group}

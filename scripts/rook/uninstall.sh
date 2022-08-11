@@ -25,6 +25,7 @@ kinds_in_namespace=(
   "CephObjectZoneGroup"
   "CephObjectRealm"
   "CephFilesystem"
+  "CephFilesystemSubvolumeGroup"
   "CephFilesystemMirror"
   "CephBlockPool"
   "CephRBDMirror"

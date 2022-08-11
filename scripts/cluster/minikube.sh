@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -eEuo pipefail
 
-: "${MINIKUBE:-"minikube"}"
-: "${PODMAN:-"podman"}"
+: "${MINIKUBE:="minikube"}"
+: "${PODMAN:="podman"}"
 
 
 minikube_args=(

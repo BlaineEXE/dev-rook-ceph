@@ -28,6 +28,7 @@ cluster.build:
 	@ $(BASH_CMD) scripts/kubernetes/untaint-master.sh
 	@ $(BASH_CMD) scripts/kubernetes/wait-for-up.sh
 	@ $(BASH_CMD) scripts/kubernetes/verify.sh
+	@ $(BASH_CMD) scripts/cluster/podman-machine-local-registry.sh
 	@ kubectl apply -f scripts/cluster/container-registry.yaml
 
 ##   cluster.destroy    Destroy the previously-built development cluster

@@ -11,3 +11,6 @@ export NODE_DISK_COUNT=3
 # You can control minikube flags with env vars preceded by MINIKUBE_ also
 # export MINIKUBE_CNI=flannel
 # export MINIKUBE_CONTAINER_RUNTIME='cri-o'
+
+# containerd is reportedly the least resource intensive runtime
+export MINIKUBE_CONTAINER_RUNTIME='containerd'
