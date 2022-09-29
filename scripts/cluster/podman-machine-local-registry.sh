@@ -3,6 +3,7 @@ set -eEuo pipefail
 
 : "${PODMAN:="podman"}"
 
+$PODMAN machine ssh sudo mkdir -p /etc/containers/registries.conf.d/
 $PODMAN machine ssh sudo tee /etc/containers/registries.conf.d/555-insecure-local.conf <<EOF
 unqualified-search-registries=["localhost:5000"]
 
