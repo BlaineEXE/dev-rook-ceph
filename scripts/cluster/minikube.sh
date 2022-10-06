@@ -10,6 +10,7 @@ minikube_args=(
   --cpus="${NODE_CPUS}"
   --memory="${NODE_MEMORY_GB}gb"
   --extra-disks="${NODE_DISK_COUNT}"
+  --insecure-registry="localhost:5000"
 )
 
 if [[ -n "${NODE_DISK_SIZE_GB:-}" ]]; then
