@@ -29,9 +29,9 @@ $(CCACHE_DIR):
 
 ##
 ## CEPH BUILD TARGETS
-##   ceph.build: (TODO: DESCRIPTION, TODO: fix broken build)
-ceph.build: .ceph.repo .ceph.buildcontainer $(CCACHE_DIR)
-	@ $(BASH_CMD) scripts/ceph/build-in-dockerfile.sh
+# ##   ceph.build: (TODO: DESCRIPTION, TODO: fix broken build)
+# ceph.build: .ceph.repo .ceph.buildcontainer $(CCACHE_DIR)
+# 	@ $(BASH_CMD) scripts/ceph/build-in-dockerfile.sh
 
 export CEPH_BASE_IMAGE ?= quay.io/ceph/daemon-base
 ##   ceph.build.image   Overlay locally-built Ceph files on top of a Ceph base image, and push the
